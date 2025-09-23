@@ -1,0 +1,91 @@
+body {
+	font-size: 1.2em;
+}
+
+div {
+	border: solid 1px black;
+}
+
+h1 {
+	text-align: center;
+	margin: 0;
+}
+
+p {
+	margin: 0;
+}
+
+.project_title {
+	cursor: pointer;
+}
+
+.popup_text {
+	color: white;
+}
+
+#main_container {
+	display: flex;
+	height: 92%;
+}
+
+#task_container {
+	width: 30%;
+}
+#category_container {
+	width: 70%;
+}
+
+.sect_header {
+	text-align: center;
+	font-size: 2em;
+}
+
+.category_header {
+	text-align: center;
+	font-size: 1.5em;
+}
+
+.project_task_container {
+	display: flex;
+	flex-direction: column;
+}
+
+.project_task {
+	cursor: pointer;
+}
+
+.category_content {
+	display: flex;
+}
+
+.general_task {
+	display: flex;
+	justify-content: space-between;
+}
+
+.general_task_checkbox {
+	width: 100%;
+}
+
+.on_general {
+	background-color: lightblue;
+}
+
+
+
+.general_task_text {
+	min-width: 25vw;
+	p {
+		margin-left: 2px;
+	}
+}
+
+#panel_popup {
+	display: none;
+	position: absolute;
+	background-color: rgba(0,0,0,0.8);
+	top: 20vh;
+	left: 20vw;
+	right: 20vw;
+	bottom: 40vh;
+}

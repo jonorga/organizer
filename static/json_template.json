@@ -1,0 +1,48 @@
+{
+	"main_tasks" : {
+		0 : {
+			"description": "shovel some snow"
+			"category": "housework"
+		},
+		1 : {
+			"description": "write some code"
+			"category": "coding"
+		},
+		2 : {
+			"description": "print a benchy"
+			"category": "3D printing"
+		}
+	},
+	"categories" : {
+		"3D Printing" : {
+			"projects" : {
+				0 : {
+					"project": "RC Car",
+					"tasks_todo": [
+						"Do this",
+						"Do that",
+						"and another thing"
+					],
+					"tasks_done": [
+						"Do this",
+						"Do that",
+						"and another thing"
+					],
+				},
+				0 : {
+					"project": "Water features",
+					"tasks_todo": [
+						"Do this",
+						"Do that",
+						"and another thing"
+					],
+					"tasks_done": [
+						"Do this",
+						"Do that",
+						"and another thing"
+					],
+				}
+			}
+		}
+	}
+}

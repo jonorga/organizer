@@ -1,0 +1,84 @@
+{
+  "categories": {
+    "3D Printing": {
+      "0": {
+        "project": "RC Car",
+        "tasks_todo": [
+          {
+            "task": "task1",
+            "spot": 0
+          },
+          {
+            "task": "task2",
+            "spot": 0
+          },
+          {
+            "task": "task3",
+            "spot": 0
+          }
+        ],
+        "tasks_done": [
+          "first thing",
+          "second thing"
+        ]
+      },
+      "1": {
+        "project": "Water features",
+        "tasks_todo": [
+          {
+            "task": "Do this",
+            "spot": 5
+          }
+        ],
+        "tasks_done": [
+          "Do this",
+          "Do that",
+          "and another thing"
+        ]
+      }
+    },
+    "Housework": {
+      "0": {
+        "project": "cleaning",
+        "tasks_todo": [
+          {
+            "task": "clean table",
+            "spot": 2
+          },
+          {
+            "task": "blerp",
+            "spot": 4
+          }
+        ]
+      },
+      "1": {
+        "project": "ad",
+        "tasks_todo": [
+          {
+            "task": "blerp",
+            "spot": 1
+          },
+          {
+            "task": "taskA",
+            "spot": 0
+          }
+        ]
+      }
+    },
+    "blerp": {
+      "0": {
+        "project": "yerp",
+        "tasks_todo": []
+      },
+      "1": {
+        "project": "awdnm",
+        "tasks_todo": [
+          {
+            "task": "something",
+            "spot": 3
+          }
+        ]
+      }
+    }
+  }
+}

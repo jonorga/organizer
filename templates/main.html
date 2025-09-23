@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+		<script type="module" src="{{ url_for('static',filename='organizer.js') }}"></script>
+	</head>
+	<body>
+		<h1>Planner</h1>
+		<button id="add_category_query">Add category</button>
+		<div id="main_container">
+			<div id="task_container">
+				<div class="sect_header">Tasks</div>
+			</div>
+			<div id="category_container">
+				<div class="sect_header">Category</div>
+			</div>
+		</div>
+		<div id="panel_popup">
+			<button id="close_popup_btn">Close popup</button>
+			<div id="add_category_popup" style="display: none;">
+				<p class="popup_text">Add category</p>
+				<input type="text" id="add_category_name">
+				<button id="add_category_submit">Add Category</button>
+			</div>
+			<div id="add_project_popup" style="display: none;">
+				<p class="popup_text" id="popup_project_text">Add project to category: </p>
+				<input type="text" id="add_project_name">
+				<button id="add_project_submit">Add Project</button>
+				<button id="delete_category_btn">Delete Category</button>
+			</div>
+			<div id="add_project_task_popup" style="display: none;">
+				<p class="popup_text" id="popup_project_task_text">Add task to project: </p>
+				<input type="text" id="add_project_task_name">
+				<button id="add_project_task_submit">Add Project Task</button>
+				<button id="delete_project_btn">Delete Project</button>
+			</div>
+		</div>
+	</body>
+</html>
