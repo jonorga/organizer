@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function addProjectTask(category, project, task, on_general) {
-		const task_div = document.createElement("div");
+		const task_div = document.createElement("li");
 		task_div.classList.add("project_task");
 		if (on_general)
 			task_div.classList.add("on_general");

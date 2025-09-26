@@ -8,17 +8,21 @@
 	--cyan: #baf2e9;
 	--blue: #bad7f2;
 	--tan: #f2e2ba;
+	min-height: 100%;
+}
+
+html {
+	min-height: 100vh;
 }
 
 body {
 	font-size: 1.2em;
 	background-color: var(--bright1);
 	font-family: "Mulish", sans-serif;
+	min-height: 100vh;
 }
 
-div {
-	/*border: solid 1px black;*/
-}
+
 
 h1 {
 	text-align: center;
@@ -38,10 +42,12 @@ p {
 #main_container {
 	background-color: var(--cyan);
 	border-radius: 25px;
+	display: flex;
 }
 
 .project_title {
 	cursor: pointer;
+	border-bottom: 1px solid var(--bright3);
 }
 
 .popup_text {
@@ -58,10 +64,7 @@ p {
 	right: 20px;
 }
 
-#main_container {
-	display: flex;
-	height: 92%;
-}
+
 
 #task_container {
 	width: 30%;
@@ -73,6 +76,11 @@ p {
 
 .project_container {
 	border: 1px solid var(--bright4);
+	padding: 5px;
+	max-width: 25vw;
+	border-radius: 5px;
+	margin: 5px;
+	background-color: var(--bright5);
 }
 
 .sect_header {
@@ -93,11 +101,14 @@ p {
 
 .project_task {
 	cursor: pointer;
+	border-bottom: 1px solid var(--bright3);
+	padding: 5px;
 }
 
 .category_content {
 	display: flex;
 	border-bottom: 1px solid var(--bright3);
+	background-color: var(--blue)
 }
 
 .general_task {
