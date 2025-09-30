@@ -32,6 +32,18 @@ document.addEventListener("DOMContentLoaded", function () {
 			.then((res) => console.log(res))
 	}
 
+	function reconcileTaskSpots(delete_spot) {
+		for (const category_ in app_data["categories"]) {
+			for (const idx_ in app_data["categories"][category_]) {
+				const project_ = app_data["categories"][category_][idx_];
+				
+				for (const task_ of project_["tasks_todo"]) {
+					task_["spot"] = task_["spot"] >= delete_spot ? task_["spot"] - 1: task_["spot"];
+				}
+			}
+		}
+	}
+
 	async function deleteFinishedTask(e) {
 		const info = e.srcElement.parentElement;
 		const delete_spot = info.getAttribute("data-spot");
@@ -40,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const idx = info.getAttribute("data-idx");
 		const task = info.getAttribute("data-content");
 
+		app_data["categories"][category][idx]["tasks_done"].push(task);
 
 		let opacity_val = 1;
 		while (opacity_val > 0) {
@@ -56,16 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			i++;
 		}
 
-		for (const category_ in app_data["categories"]) {
-			for (const idx_ in app_data["categories"][category_]) {
-				const project_ = app_data["categories"][category_][idx_];
-				
-				for (const task_ of project_["tasks_todo"]) {
-					task_["spot"] = task_["spot"] >= delete_spot ? task_["spot"] - 1: task_["spot"];
-				}
-			}
-			
-		}
+		reconcileTaskSpots(delete_spot);
 		
 		refreshPage(app_data, delete_spot);
 		saveData(app_data);
@@ -81,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		div.setAttribute("data-spot", spot);
 		div.setAttribute("data-idx", idx);
 		div.setAttribute("data-content", text);
+		div.setAttribute("draggable", true);
 		
 
 		const checkbox = document.createElement("input");
@@ -116,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#add_project_name").value = "";
 		closePopup();
 		const project_key = Object.keys(app_data["categories"][unhyphenatedName(category)]).length;
-		app_data["categories"][unhyphenatedName(category)][project_key] = {"project": project, "tasks_todo": []};
+		app_data["categories"][unhyphenatedName(category)][project_key] = {"project": project, "tasks_todo": [], "tasks_done": []};
 		refreshPage(app_data);
 		saveData(app_data);
 		
@@ -173,19 +178,31 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = unhyphenatedName(info[2]);
 		const idx = e.srcElement.parentElement.getAttribute("idx");
 
+		const on_general = [...e.srcElement.classList].includes("on_general");
 		
-		app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
-			item["task"] == task && item["spot"] == 0 ? item["spot"] = general_tasks["highest"] + 1 : item["spot"] = item["spot"]);
+		if (!on_general) {
+			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
+				item["task"] == task && item["spot"] == 0 ? item["spot"] = general_tasks["highest"] + 1 : item["spot"] = item["spot"]);
+		}
+		else {
+			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
+				item["task"] == task && item["spot"] != 0 ? item["spot"] = 0 : item["spot"] = item["spot"]);
+			reconcileTaskSpots(e.srcElement.getAttribute("data-spot"));
+		}
+		
+
 		refreshPage(app_data);
 		saveData(app_data);
 		
 	}
 
-	function addProjectTask(category, project, task, on_general) {
+	function addProjectTask(category, project, task, spot) {
 		const task_div = document.createElement("li");
 		task_div.classList.add("project_task");
-		if (on_general)
+		if (spot != 0) {
 			task_div.classList.add("on_general");
+			task_div.setAttribute("data-spot", spot);
+		}
 		task_div.addEventListener("click", selectTask);
 		task_div.innerText = task;
 
@@ -217,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				const tasks = projects[idx]["tasks_todo"];
 				createProject(project, category, idx);
 				for (const task of tasks) {
-					addProjectTask(category, project, task["task"], task["spot"] != 0);
+					addProjectTask(category, project, task["task"], task["spot"]);
 					const spot = task["spot"];
 					if (spot > 0) {
 						general_tasks["highest"] = general_tasks["highest"] < spot ? spot : general_tasks["highest"];
