@@ -5,9 +5,13 @@ document.addEventListener("DOMContentLoaded", function () {
 	let next_spot = 0;
 	let general_tasks;
 
+// Region Helper ==========================================================
 	function unhyphenatedName(name) { return name.replaceAll("-", " ") }
 	const delay = ms => new Promise(res => setTimeout(res, ms));
+// End Region Helper ======================================================
 
+
+// Region DataFunctions ===============================================================
 	function getData() {
 		fetch("static/data.json")
 			.then((res) => {
@@ -44,6 +48,32 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 
+	function submitProjectTask() {
+		const cat_proj = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
+		const task = document.querySelector("#add_project_task_name").value;
+		document.querySelector("#add_project_task_name").value = "";
+		const category = cat_proj[0];
+		const project = cat_proj[1];
+		const idx = cat_proj[2]
+		
+
+		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
+		refreshPage(app_data);
+		saveData(app_data);
+		closePopup();
+	}
+
+	function addCategorySubmit() {
+		const new_cat_name = document.querySelector("#add_category_name").value;
+		if (!(new_cat_name in app_data["categories"]))
+			app_data["categories"][new_cat_name] = {};
+		document.querySelector("#add_category_name").value = "";
+		refreshPage(app_data);
+		saveData(app_data);
+	}
+// End Region DataFunctions ===========================================================
+
+// Region PageActions =================================================================
 	async function deleteFinishedTask(e) {
 		const info = e.srcElement.parentElement;
 		const delete_spot = info.getAttribute("data-spot");
@@ -75,43 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 	}
 
-	function createGeneralTask(text, category_project, spot, idx, priority) {
-		const div = document.createElement("div");
-		div.classList.add("general_task");
-		if (priority == 3)
-			div.classList.add("high_priority_general");
-		else if (priority == 2)
-			div.classList.add("medium_priority_general");
-		const category = category_project.split("-")[0];
-		const project = category_project.split("-")[1];
-		div.setAttribute("data-category", category);
-		div.setAttribute("data-project", project);
-		div.setAttribute("data-spot", spot);
-		div.setAttribute("data-idx", idx);
-		div.setAttribute("data-content", text);
-		div.setAttribute("priority", priority);
-		
-
-		const checkbox = document.createElement("input");
-		checkbox.name = "task_complete";
-		checkbox.setAttribute("type", "checkbox");
-		checkbox.classList.add("general_task_checkbox");
-		checkbox.addEventListener("click", deleteFinishedTask);
-
-		const task_text_div = document.createElement("div");
-		task_text_div.classList.add("general_task_text");
-		const task_text = document.createElement("p");
-		task_text.innerText = text;
-		const task_category = document.createElement("p");
-		task_category.innerText = category_project;
-		task_text_div.appendChild(task_text);
-		task_text_div.appendChild(task_category);
-
-		div.appendChild(checkbox);
-		div.appendChild(task_text_div);
-		document.querySelector("#task_container").appendChild(div);
-	}
-
 	function addProjectButton(e) {
 		const category = e.srcElement.parentElement.parentElement.id.split("_")[1];
 		document.querySelector("#popup_project_text").innerText = `Add project to category: ${category}`;
@@ -128,51 +121,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		app_data["categories"][unhyphenatedName(category)][project_key] = {"project": project, "tasks_todo": [], "tasks_done": []};
 		refreshPage(app_data);
 		saveData(app_data);
-		
-	}
-
-	function createCategory(category) {
-		const main_div = document.createElement("div");
-		main_div.classList.add("individual_category");
-		main_div.id = `cat_${category.replaceAll(" ", "-")}`;
-		
-
-		const category_header = document.createElement("p");
-		category_header.classList.add("category_header");
-		category_header.innerText = category;
-
-		const category_content = document.createElement("div");
-		category_content.classList.add("category_content");
-		category_content.id = `cat_${category.replaceAll(" ", "-")}_content`;
-
-		const add_project_btn = document.createElement("button");
-		add_project_btn.innerHTML = "Add project";
-		add_project_btn.addEventListener("click", addProjectButton);
-		category_header.appendChild(add_project_btn);
-		
-
-		main_div.appendChild(category_header);
-		main_div.appendChild(category_content);
-		document.querySelector("#category_container").appendChild(main_div);
-	}
-
-
-
-	function createProject(project, category, idx) {
-		const project_div = document.createElement("div");
-		project_div.classList.add("project_container");
-		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
-		project_div.setAttribute("idx", idx);
-
-		const project_title = document.createElement("p");
-		project_title.innerText = project;
-		project_title.classList.add("project_title");
-		project_title.addEventListener("click", openProjectTaskPopup);
-
-		project_div.appendChild(project_title);
-
-
-		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
 	}
 
 	function openTaskPopup(task, priority, category, project, idx, on_general, spot) {
@@ -250,7 +198,138 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		
 		openTaskPopup(task, priority, category, project, idx, on_general, spot);
+	}	
+
+	function deleteProject() {
+		const info = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
+		const category = unhyphenatedName(info[0]);
+		const idx = info[2];
+		delete app_data["categories"][category][idx];
+		closePopup();
+		refreshPage(app_data);
+		saveData(app_data);
 	}
+
+	function deleteCategory() {
+		const info = document.querySelector("#add_project_popup").getAttribute("description");
+		console.log(info);
+		const category = unhyphenatedName(info);
+		delete app_data["categories"][category];
+		closePopup();
+		refreshPage(app_data);
+		saveData(app_data);
+	}
+
+	function openProjectTaskPopup(e) {
+		document.querySelector("#add_project_task_popup").style.display =  "block";
+		document.querySelector("#panel_popup").style.display = "block";
+		document.querySelector("#add_project_task_name").focus();
+
+		const project = e.srcElement.parentElement.id.split("_")[2];
+		const category = e.srcElement.parentElement.id.split("_")[1];
+		const idx = e.srcElement.parentElement.getAttribute("idx");
+
+		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
+		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`)
+	}
+
+	function openCategoryPopup () {
+		document.querySelector("#add_project_popup").style.display =  "block";
+		document.querySelector("#panel_popup").style.display = "block";
+	};
+
+	function closePopup() {
+		document.querySelector("#panel_popup").style.display = "none";
+		document.querySelector("#add_category_popup").style.display =  "none";
+		document.querySelector("#add_project_popup").style.display =  "none";
+		document.querySelector("#add_project_task_popup").style.display =  "none";
+		document.querySelector("#task_selected").style.display =  "none";
+	}
+// Region End PageActions ===============================================================	
+
+// Region PageBuild
+	function createGeneralTask(text, category_project, spot, idx, priority) {
+		const div = document.createElement("div");
+		div.classList.add("general_task");
+		if (priority == 3)
+			div.classList.add("high_priority_general");
+		else if (priority == 2)
+			div.classList.add("medium_priority_general");
+		const category = category_project.split("-")[0];
+		const project = category_project.split("-")[1];
+		div.setAttribute("data-category", category);
+		div.setAttribute("data-project", project);
+		div.setAttribute("data-spot", spot);
+		div.setAttribute("data-idx", idx);
+		div.setAttribute("data-content", text);
+		div.setAttribute("priority", priority);
+		
+
+		const checkbox = document.createElement("input");
+		checkbox.name = "task_complete";
+		checkbox.setAttribute("type", "checkbox");
+		checkbox.classList.add("general_task_checkbox");
+		checkbox.addEventListener("click", deleteFinishedTask);
+
+		const task_text_div = document.createElement("div");
+		task_text_div.classList.add("general_task_text");
+		const task_text = document.createElement("p");
+		task_text.innerText = text;
+		const task_category = document.createElement("p");
+		task_category.innerText = category_project;
+		task_text_div.appendChild(task_text);
+		task_text_div.appendChild(task_category);
+
+		div.appendChild(checkbox);
+		div.appendChild(task_text_div);
+		document.querySelector("#task_container").appendChild(div);
+	}
+
+	function createCategory(category) {
+		const main_div = document.createElement("div");
+		main_div.classList.add("individual_category");
+		main_div.id = `cat_${category.replaceAll(" ", "-")}`;
+		
+
+		const category_header = document.createElement("p");
+		category_header.classList.add("category_header");
+		category_header.innerText = category;
+
+		const category_content = document.createElement("div");
+		category_content.classList.add("category_content");
+		category_content.id = `cat_${category.replaceAll(" ", "-")}_content`;
+
+		const add_project_btn = document.createElement("button");
+		add_project_btn.innerHTML = "Add project";
+		add_project_btn.addEventListener("click", addProjectButton);
+		category_header.appendChild(add_project_btn);
+		
+
+		main_div.appendChild(category_header);
+		main_div.appendChild(category_content);
+		document.querySelector("#category_container").appendChild(main_div);
+	}
+
+
+
+	function createProject(project, category, idx) {
+		const project_div = document.createElement("div");
+		project_div.classList.add("project_container");
+		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
+		project_div.setAttribute("idx", idx);
+
+		const project_title = document.createElement("p");
+		project_title.innerText = project;
+		project_title.classList.add("project_title");
+		project_title.addEventListener("click", openProjectTaskPopup);
+
+		project_div.appendChild(project_title);
+
+
+		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
+	}
+
+
 
 	function addProjectTask(category, project, task, spot, priority) {
 		const task_div = document.createElement("li");
@@ -268,6 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`
 		document.querySelector(`#${parent_id}`).appendChild(task_div);
 	}
+// Region End PageBuild
 
 	function refreshPage(data) {
 		const existing_tasks = document.getElementsByClassName("general_task");
@@ -317,25 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 
-	function deleteProject() {
-		const info = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
-		const category = unhyphenatedName(info[0]);
-		const idx = info[2];
-		delete app_data["categories"][category][idx];
-		closePopup();
-		refreshPage(app_data);
-		saveData(app_data);
-	}
 
-	function deleteCategory() {
-		const info = document.querySelector("#add_project_popup").getAttribute("description");
-		console.log(info);
-		const category = unhyphenatedName(info);
-		delete app_data["categories"][category];
-		closePopup();
-		refreshPage(app_data);
-		saveData(app_data);
-	}
 
 	document.querySelector("#delete_project_btn").addEventListener("click", deleteProject);
 	document.querySelector("#delete_category_btn").addEventListener("click", deleteCategory);
@@ -350,58 +412,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#panel_popup").style.display = "block";
 	});
 
-	function openProjectTaskPopup(e) {
-		document.querySelector("#add_project_task_popup").style.display =  "block";
-		document.querySelector("#panel_popup").style.display = "block";
-		document.querySelector("#add_project_task_name").focus();
-
-		const project = e.srcElement.parentElement.id.split("_")[2];
-		const category = e.srcElement.parentElement.id.split("_")[1];
-		const idx = e.srcElement.parentElement.getAttribute("idx");
-
-		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
-		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`)
-	}
-
-	function openCategoryPopup () {
-		document.querySelector("#add_project_popup").style.display =  "block";
-		document.querySelector("#panel_popup").style.display = "block";
-	};
-
-	function closePopup() {
-		document.querySelector("#panel_popup").style.display = "none";
-		document.querySelector("#add_category_popup").style.display =  "none";
-		document.querySelector("#add_project_popup").style.display =  "none";
-		document.querySelector("#add_project_task_popup").style.display =  "none";
-		document.querySelector("#task_selected").style.display =  "none";
-	}
-
-	function submitProjectTask() {
-		const cat_proj = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
-		const task = document.querySelector("#add_project_task_name").value;
-		document.querySelector("#add_project_task_name").value = "";
-		const category = cat_proj[0];
-		const project = cat_proj[1];
-		const idx = cat_proj[2]
-		
-
-		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
-		refreshPage(app_data);
-		saveData(app_data);
-		closePopup();
-	}
 
 	document.querySelector("#close_popup_btn").addEventListener("click", closePopup);
 	document.querySelector("#add_project_task_submit").addEventListener("click", submitProjectTask);
 
-	document.querySelector("#add_category_submit").addEventListener("click", function () {
-		const new_cat_name = document.querySelector("#add_category_name").value;
-		if (!(new_cat_name in app_data["categories"]))
-			app_data["categories"][new_cat_name] = {};
-		document.querySelector("#add_category_name").value = "";
-		refreshPage(app_data);
-		saveData(app_data);
-	});
+	document.querySelector("#add_category_submit").addEventListener("click", addCategorySubmit);
 
 	getData();
 });
