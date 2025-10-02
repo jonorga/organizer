@@ -75,9 +75,13 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 	}
 
-	function createGeneralTask(text, category_project, spot, idx) {
+	function createGeneralTask(text, category_project, spot, idx, priority) {
 		const div = document.createElement("div");
 		div.classList.add("general_task");
+		if (priority == 3)
+			div.classList.add("high_priority_general");
+		else if (priority == 2)
+			div.classList.add("medium_priority_general");
 		const category = category_project.split("-")[0];
 		const project = category_project.split("-")[1];
 		div.setAttribute("data-category", category);
@@ -85,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		div.setAttribute("data-spot", spot);
 		div.setAttribute("data-idx", idx);
 		div.setAttribute("data-content", text);
-		div.setAttribute("draggable", true);
+		div.setAttribute("priority", priority);
 		
 
 		const checkbox = document.createElement("input");
@@ -171,38 +175,93 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
 	}
 
-	function selectTask(e) {
-		const info = e.srcElement.parentElement.id.split("_");
-		const task = e.srcElement.innerText;
-		const category = unhyphenatedName(info[1]);
-		const project = unhyphenatedName(info[2]);
-		const idx = e.srcElement.parentElement.getAttribute("idx");
+	function openTaskPopup(task, priority, category, project, idx, on_general, spot) {
+		const task_selected_div = document.querySelector("#task_selected");
+		task_selected_div.style.display =  "block";
+		document.querySelector("#panel_popup").style.display = "block";
+		document.querySelector("#task_info").innerText = `Selected task: ${task}`;
+		document.querySelector("#task_priority").value = priority == 3 ? "High" : priority == 2 ? "Medium" : "Low";
+		task_selected_div.setAttribute("data-task", task);
+		task_selected_div.setAttribute("data-category", category);
+		task_selected_div.setAttribute("data-project", project);
+		task_selected_div.setAttribute("data-idx", idx);
+		task_selected_div.setAttribute("data-on-general", on_general);
+		task_selected_div.setAttribute("data-spot", on_general);
+	}
 
-		const on_general = [...e.srcElement.classList].includes("on_general");
-		
+	function onOffGeneralToggle() {
+		const task_popup_elem = document.querySelector("#task_selected");
+		const task = task_popup_elem.getAttribute("data-task");
+		const category = task_popup_elem.getAttribute("data-category");
+		const project = task_popup_elem.getAttribute("data-project");
+		const idx = task_popup_elem.getAttribute("data-idx");
+		const on_general = task_popup_elem.getAttribute("data-on-general") == "false" ? false : true;
+		const spot = task_popup_elem.getAttribute("data-spot");
+
+		console.log(typeof(on_general));
 		if (!on_general) {
+			console.log("hit");
 			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
 				item["task"] == task && item["spot"] == 0 ? item["spot"] = general_tasks["highest"] + 1 : item["spot"] = item["spot"]);
 		}
 		else {
 			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
 				item["task"] == task && item["spot"] != 0 ? item["spot"] = 0 : item["spot"] = item["spot"]);
-			reconcileTaskSpots(e.srcElement.getAttribute("data-spot"));
+			reconcileTaskSpots(spot);
 		}
 		
 
 		refreshPage(app_data);
 		saveData(app_data);
-		
+		closePopup();
 	}
 
-	function addProjectTask(category, project, task, spot) {
+	function priorityToggle(obj) {
+		const new_priority = obj.target.value == "High" ? 3 : obj.target.value == "Medium" ? 2 : 1;
+		const parent = obj.srcElement.parentElement;
+		const category = parent.getAttribute("data-category");
+		const idx = parent.getAttribute("data-idx");
+		const task = parent.getAttribute("data-task");
+
+
+
+		app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
+				item["task"] == task ? item["priority"] = new_priority : item["priority"] = item["priority"]);
+
+		refreshPage(app_data);
+		saveData(app_data);
+		closePopup();
+	}
+
+	function selectTask(e) {
+		// Turn this into a popup
+		// if put onto general list run this anyways as well
+
+
+		const info = e.srcElement.parentElement.id.split("_");
+		const task = e.srcElement.innerText;
+		const category = unhyphenatedName(info[1]);
+		const project = unhyphenatedName(info[2]);
+		const idx = e.srcElement.parentElement.getAttribute("idx");
+		const priority = e.srcElement.getAttribute("data-priority");
+		const spot = e.srcElement.getAttribute("data-spot") || 0;
+
+		const on_general = [...e.srcElement.classList].includes("on_general");
+
+		
+		openTaskPopup(task, priority, category, project, idx, on_general, spot);
+	}
+
+	function addProjectTask(category, project, task, spot, priority) {
 		const task_div = document.createElement("li");
 		task_div.classList.add("project_task");
+		if (priority == 3) task_div.classList.add("high_priority");
+		else if (priority == 2) task_div.classList.add("medium_priority");
 		if (spot != 0) {
 			task_div.classList.add("on_general");
 			task_div.setAttribute("data-spot", spot);
 		}
+		task_div.setAttribute("data-priority", priority);
 		task_div.addEventListener("click", selectTask);
 		task_div.innerText = task;
 
@@ -234,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				const tasks = projects[idx]["tasks_todo"];
 				createProject(project, category, idx);
 				for (const task of tasks) {
-					addProjectTask(category, project, task["task"], task["spot"]);
+					addProjectTask(category, project, task["task"], task["spot"], task["priority"]);
 					const spot = task["spot"];
 					if (spot > 0) {
 						general_tasks["highest"] = general_tasks["highest"] < spot ? spot : general_tasks["highest"];
@@ -242,7 +301,8 @@ document.addEventListener("DOMContentLoaded", function () {
 							"task": task["task"],
 							"category-project": `${category}-${project}`,
 							"spot": spot,
-							"idx": idx
+							"idx": idx,
+							"priority": task["priority"]
 						};
 					}
 				}	
@@ -252,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		let i = 1;
 		while (i <= general_tasks["highest"]) {
 			createGeneralTask(general_tasks[i]["task"], general_tasks[i]["category-project"], 
-				general_tasks[i]["spot"], general_tasks[i]["idx"]);
+				general_tasks[i]["spot"], general_tasks[i]["idx"], general_tasks[i]["priority"]);
 			i++;
 		}
 	}
@@ -282,6 +342,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	document.querySelector("#add_project_submit").addEventListener("click", addProjectSubmit);
 
+	document.querySelector("#add_task_to_general").addEventListener("click", onOffGeneralToggle);
+	document.querySelector("#task_priority").onchange = priorityToggle;
+
 	document.querySelector("#add_category_query").addEventListener("click", function () {
 		document.querySelector("#add_category_popup").style.display =  "block";
 		document.querySelector("#panel_popup").style.display = "block";
@@ -310,6 +373,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#add_category_popup").style.display =  "none";
 		document.querySelector("#add_project_popup").style.display =  "none";
 		document.querySelector("#add_project_task_popup").style.display =  "none";
+		document.querySelector("#task_selected").style.display =  "none";
 	}
 
 	function submitProjectTask() {
@@ -321,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const idx = cat_proj[2]
 		
 
-		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0});
+		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
 		refreshPage(app_data);
 		saveData(app_data);
 		closePopup();

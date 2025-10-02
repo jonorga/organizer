@@ -11,6 +11,22 @@
 	min-height: 100%;
 }
 
+.high_priority::marker {
+	color: red;
+}
+
+.medium_priority::marker {
+	color: yellow;
+}
+
+.high_priority_general {
+	background-color: red;
+}
+
+.medium_priority_general {
+	background-color: yellow;
+}
+
 html {
 	min-height: 100vh;
 }
