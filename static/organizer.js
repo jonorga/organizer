@@ -1,5 +1,3 @@
-
-
 document.addEventListener("DOMContentLoaded", function () {
 	let app_data = {};
 	let next_spot = 0;
@@ -134,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_selected_div.setAttribute("data-project", project);
 		task_selected_div.setAttribute("data-idx", idx);
 		task_selected_div.setAttribute("data-on-general", on_general);
-		task_selected_div.setAttribute("data-spot", on_general);
+		task_selected_div.setAttribute("data-spot", spot);
 	}
 
 	function onOffGeneralToggle() {
@@ -146,9 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const on_general = task_popup_elem.getAttribute("data-on-general") == "false" ? false : true;
 		const spot = task_popup_elem.getAttribute("data-spot");
 
-		console.log(typeof(on_general));
+
 		if (!on_general) {
-			console.log("hit");
 			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
 				item["task"] == task && item["spot"] == 0 ? item["spot"] = general_tasks["highest"] + 1 : item["spot"] = item["spot"]);
 		}
@@ -247,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 // Region End PageActions ===============================================================	
 
-// Region PageBuild
+// Region PageBuild ====================================================================
 	function createGeneralTask(text, category_project, spot, idx, priority) {
 		const div = document.createElement("div");
 		div.classList.add("general_task");
@@ -347,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`
 		document.querySelector(`#${parent_id}`).appendChild(task_div);
 	}
-// Region End PageBuild
+// Region End PageBuild ================================================================
 
 	function refreshPage(data) {
 		const existing_tasks = document.getElementsByClassName("general_task");
@@ -398,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 
-
+// Region EventListeners
 	document.querySelector("#delete_project_btn").addEventListener("click", deleteProject);
 	document.querySelector("#delete_category_btn").addEventListener("click", deleteCategory);
 
@@ -417,6 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#add_project_task_submit").addEventListener("click", submitProjectTask);
 
 	document.querySelector("#add_category_submit").addEventListener("click", addCategorySubmit);
+// Region End EventListeners
 
 	getData();
 });

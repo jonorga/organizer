@@ -11,6 +11,8 @@
 	min-height: 100%;
 }
 
+
+
 .high_priority::marker {
 	color: red;
 }
@@ -29,13 +31,13 @@
 
 html {
 	min-height: 100vh;
+	scrollbar-color: grey rgba(0,0,0,0);
 }
 
 body {
-	font-size: 1.2em;
 	background-color: var(--bright1);
 	font-family: "Mulish", sans-serif;
-	min-height: 100vh;
+	/*min-height: 100vh;*/
 }
 
 
@@ -59,6 +61,8 @@ p {
 	background-color: var(--cyan);
 	border-radius: 25px;
 	display: flex;
+	max-height: 92vh;
+	
 }
 
 .project_title {
@@ -85,15 +89,19 @@ p {
 #task_container {
 	width: 30%;
 	border-right: 2px solid var(--bright5);
+	overflow-y: auto;
 }
 #category_container {
 	width: 70%;
+	overflow-y: auto;
 }
 
 .project_container {
 	border: 1px solid var(--bright4);
 	padding: 5px;
-	max-width: 25vw;
+	max-width: 15vw;
+	min-width: 15vw;
+	height: fit-content;
 	border-radius: 5px;
 	margin: 5px;
 	background-color: var(--bright5);
@@ -124,7 +132,9 @@ p {
 .category_content {
 	display: flex;
 	border-bottom: 1px solid var(--bright3);
-	background-color: var(--blue)
+	background-color: var(--blue);
+	overflow-x: auto;
+	scrollbar-color: grey rgba(0,0,0,0);
 }
 
 .general_task {
