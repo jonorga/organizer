@@ -84,7 +84,15 @@ p {
 	right: 20px;
 }
 
-
+.promote_btn {
+	display: none;
+	
+	right: 0;
+	font-size: 1.5em;
+	padding: 5px;
+	background-color: rgba(0,0,0,0);
+	border-radius: 5px;
+}
 
 #task_container {
 	width: 30%;

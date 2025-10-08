@@ -46,6 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 	}
 
+	function assignTaskSpot(category, idx, assign_task, spot) {
+		for (const task of app_data["categories"][category][idx]["tasks_todo"]) {
+			if (task["task"] == assign_task) {
+				task["spot"] = spot;
+			}
+		}
+	}
+
 	function submitProjectTask() {
 		const cat_proj = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
 		const task = document.querySelector("#add_project_task_name").value;
@@ -66,6 +74,28 @@ document.addEventListener("DOMContentLoaded", function () {
 		if (!(new_cat_name in app_data["categories"]))
 			app_data["categories"][new_cat_name] = {};
 		document.querySelector("#add_category_name").value = "";
+		refreshPage(app_data);
+		saveData(app_data);
+	}
+
+	function promoteGeneralTask(e) {
+		const lower_spot = e.srcElement.id.split("_")[1];
+		if (lower_spot == 1) return;
+		const upper_spot = lower_spot - 1;
+
+		const lower_category = general_tasks[lower_spot]["category-project"].split("-")[0];
+		const lower_project = general_tasks[lower_spot]["category-project"].split("-")[1];
+		const lower_task = general_tasks[lower_spot]["task"];
+		const lower_idx = general_tasks[lower_spot]["idx"];
+
+		const upper_category = general_tasks[upper_spot]["category-project"].split("-")[0];
+		const upper_project = general_tasks[upper_spot]["category-project"].split("-")[1];
+		const upper_task = general_tasks[upper_spot]["task"];
+		const upper_idx = general_tasks[upper_spot]["idx"];
+
+		assignTaskSpot(lower_category, lower_idx, lower_task, upper_spot);
+		assignTaskSpot(upper_category, upper_idx, upper_task, lower_spot);
+
 		refreshPage(app_data);
 		saveData(app_data);
 	}
@@ -247,6 +277,13 @@ document.addEventListener("DOMContentLoaded", function () {
 // Region PageBuild ====================================================================
 	function createGeneralTask(text, category_project, spot, idx, priority) {
 		const div = document.createElement("div");
+		div.addEventListener("mouseover", function () {
+			document.querySelector(`#promote_${spot}`).style.display = "block";
+		});
+		div.addEventListener("mouseout", function () {
+			document.querySelector(`#promote_${spot}`).style.display = "none";
+		});
+
 		div.classList.add("general_task");
 		if (priority == 3)
 			div.classList.add("high_priority_general");
@@ -268,6 +305,12 @@ document.addEventListener("DOMContentLoaded", function () {
 		checkbox.classList.add("general_task_checkbox");
 		checkbox.addEventListener("click", deleteFinishedTask);
 
+		const promote_btn = document.createElement("button");
+		promote_btn.addEventListener("click", promoteGeneralTask);
+		promote_btn.innerHTML = '&#8593;';
+		promote_btn.classList.add("promote_btn");
+		promote_btn.id = `promote_${spot}`;
+
 		const task_text_div = document.createElement("div");
 		task_text_div.classList.add("general_task_text");
 		const task_text = document.createElement("p");
@@ -279,6 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		div.appendChild(checkbox);
 		div.appendChild(task_text_div);
+		div.appendChild(promote_btn);
 		document.querySelector("#task_container").appendChild(div);
 	}
 
