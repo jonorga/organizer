@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		if (!on_general) {
 			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
-				item["task"] == task && item["spot"] == 0 ? item["spot"] = general_tasks["highest"] + 1 : item["spot"] = item["spot"]);
+				item["task"] == task && item["spot"] == 0 ? item["spot"] = parseInt(general_tasks["highest"]) + 1 : item["spot"] = item["spot"]);
 		}
 		else {
 			app_data["categories"][category][idx]["tasks_todo"].forEach(item => 
@@ -239,7 +239,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function deleteCategory() {
 		const info = document.querySelector("#add_project_popup").getAttribute("description");
-		console.log(info);
 		const category = unhyphenatedName(info);
 		delete app_data["categories"][category];
 		closePopup();
