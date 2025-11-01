@@ -192,6 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function priorityToggle(obj) {
+		console.log(obj.srcElement.parentElement);
 		const new_priority = obj.target.value == "High" ? 3 : obj.target.value == "Medium" ? 2 : 1;
 		const parent = obj.srcElement.parentElement;
 		const category = parent.getAttribute("data-category");
@@ -212,12 +213,12 @@ document.addEventListener("DOMContentLoaded", function () {
 		// Turn this into a popup
 		// if put onto general list run this anyways as well
 
-
-		const info = e.srcElement.parentElement.id.split("_");
+		const parent_elem = e.srcElement.parentElement.parentElement;
+		const info = parent_elem.id.split("_");
 		const task = e.srcElement.innerText;
 		const category = unhyphenatedName(info[1]);
 		const project = unhyphenatedName(info[2]);
-		const idx = e.srcElement.parentElement.getAttribute("idx");
+		const idx = parent_elem.getAttribute("idx");
 		const priority = e.srcElement.getAttribute("data-priority");
 		const spot = e.srcElement.getAttribute("data-spot") || 0;
 
@@ -270,6 +271,41 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#add_project_popup").style.display =  "none";
 		document.querySelector("#add_project_task_popup").style.display =  "none";
 		document.querySelector("#task_selected").style.display =  "none";
+	}
+
+	async function toggleProjectTaskView(e) {
+		const project = e.srcElement.parentElement.parentElement;
+		const q_select = project.id;
+		const target_elem = document.querySelector(`#${q_select} > div.project_task_container`);
+		const speed = 5;
+		
+		console.log(target_elem);
+		if (target_elem.hasAttribute("rolled_up")) {
+			target_elem.style.height = `100%`;
+			const goal_height = target_elem.offsetHeight;
+			target_elem.style.height = 0;
+			const increment = goal_height / 100;
+			let i = 0;
+			
+			while (i < goal_height) {
+				await delay(speed);
+				target_elem.style.height = `${i}px`;
+				i += increment;
+			}
+
+			target_elem.removeAttribute("rolled_up");
+		}
+		else {
+			let i = target_elem.offsetHeight;
+			const increment = i / 100;
+			while (i > 0) {
+				await delay(speed);
+				target_elem.style.height = `${i}px`;
+				i -= increment;
+			}
+			target_elem.style.height = 0;
+			target_elem.setAttribute("rolled_up", "");
+		}
 	}
 // Region End PageActions ===============================================================	
 
@@ -358,13 +394,26 @@ document.addEventListener("DOMContentLoaded", function () {
 		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
 		project_div.setAttribute("idx", idx);
 
-		const project_title = document.createElement("p");
+		const project_title = document.createElement("span");
 		project_title.innerText = project;
 		project_title.classList.add("project_title");
 		project_title.addEventListener("click", openProjectTaskPopup);
 
-		project_div.appendChild(project_title);
+		const fold_toggle = document.createElement("button");
+		fold_toggle.classList.add("fold_toggle");
+		fold_toggle.innerHTML = "&#8675;";
+		fold_toggle.addEventListener("click", toggleProjectTaskView);
 
+		const header_div = document.createElement("div");
+		header_div.classList.add("project_header");
+		header_div.appendChild(project_title);
+		header_div.appendChild(fold_toggle);
+
+		const task_div = document.createElement("div");
+		task_div.classList.add("project_task_container");
+
+		project_div.appendChild(header_div);
+		project_div.appendChild(task_div);
 
 		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
 	}
@@ -384,8 +433,9 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_div.addEventListener("click", selectTask);
 		task_div.innerText = task;
 
-		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`
-		document.querySelector(`#${parent_id}`).appendChild(task_div);
+		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
+		//console.log(document.querySelector(`#${parent_id} > div`));
+		document.querySelector(`#${parent_id} > div.project_task_container`).appendChild(task_div);
 	}
 // Region End PageBuild ================================================================
 
