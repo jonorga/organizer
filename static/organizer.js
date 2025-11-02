@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = cat_proj[1];
 		const idx = cat_proj[2]
 		
-
+		
 		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
 		refreshPage(app_data);
 		saveData(app_data);
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function priorityToggle(obj) {
-		console.log(obj.srcElement.parentElement);
+		
 		const new_priority = obj.target.value == "High" ? 3 : obj.target.value == "Medium" ? 2 : 1;
 		const parent = obj.srcElement.parentElement;
 		const category = parent.getAttribute("data-category");
@@ -252,9 +252,12 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#panel_popup").style.display = "block";
 		document.querySelector("#add_project_task_name").focus();
 
-		const project = e.srcElement.parentElement.id.split("_")[2];
-		const category = e.srcElement.parentElement.id.split("_")[1];
-		const idx = e.srcElement.parentElement.getAttribute("idx");
+		
+		const parent_elem = e.srcElement.parentElement.parentElement;
+
+		const project = parent_elem.id.split("_")[2];
+		const category = parent_elem.id.split("_")[1];
+		const idx = parent_elem.getAttribute("idx");
 
 		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
 		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`)
@@ -279,7 +282,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const target_elem = document.querySelector(`#${q_select} > div.project_task_container`);
 		const speed = 5;
 		
-		console.log(target_elem);
+		
 		if (target_elem.hasAttribute("rolled_up")) {
 			target_elem.style.height = `100%`;
 			const goal_height = target_elem.offsetHeight;
@@ -434,7 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_div.innerText = task;
 
 		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
-		//console.log(document.querySelector(`#${parent_id} > div`));
+		
 		document.querySelector(`#${parent_id} > div.project_task_container`).appendChild(task_div);
 	}
 // Region End PageBuild ================================================================
