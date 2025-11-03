@@ -106,6 +106,31 @@ document.addEventListener("DOMContentLoaded", function () {
 		refreshPage(app_data);
 		saveData(app_data);
 	}
+
+	function updateSchema() {
+		for (const _cat in app_data["categories"]) {
+			for (const _proj in app_data["categories"][_cat]) {
+				
+				if (!("notes" in app_data["categories"][_cat][_proj])) {
+					app_data["categories"][_cat][_proj]["notes"] = "";
+				}
+				if (!("priority" in app_data["categories"][_cat][_proj])) {
+					app_data["categories"][_cat][_proj]["priority"] = 1;
+				}
+				if (!("folded" in app_data["categories"][_cat][_proj])) {
+					app_data["categories"][_cat][_proj]["folded"] = false;
+				}
+
+				for (const item in app_data["categories"][_cat][_proj]["tasks_todo"]) {
+					if (!("date" in app_data["categories"][_cat][_proj]["tasks_todo"][item]))  {
+						app_data["categories"][_cat][_proj]["tasks_todo"][item]["date"] = undefined;
+					}
+				}
+			}
+		}
+
+		saveData(app_data);
+	}
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
@@ -517,6 +542,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#add_project_task_submit").addEventListener("click", submitProjectTask);
 
 	document.querySelector("#add_category_submit").addEventListener("click", addCategorySubmit);
+
+	document.querySelector("#update_schema_query").addEventListener("click", updateSchema);
 // Region End EventListeners
 
 	getData();

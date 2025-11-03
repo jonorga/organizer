@@ -92,6 +92,12 @@ p {
 	right: 20px;
 }
 
+#update_schema_query {
+	position: absolute;
+	top: 25px;
+	right: 140px;
+}
+
 .promote_btn {
 	display: none;
 	
