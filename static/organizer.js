@@ -291,8 +291,16 @@ document.addEventListener("DOMContentLoaded", function () {
 		const category = parent_elem.id.split("_")[1];
 		const idx = parent_elem.getAttribute("idx");
 
+
+		const tasks_done = app_data["categories"][unhyphenatedName(category)][idx]["tasks_done"]
+		for (const task of tasks_done) {
+			const temp = document.createElement("li");
+			temp.innerText = task;
+			document.querySelector("#completed_tasks_list").appendChild(temp);
+		}
+
 		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
-		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`)
+		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`);
 	}
 
 	function openCategoryPopup () {
@@ -306,6 +314,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#add_project_popup").style.display =  "none";
 		document.querySelector("#add_project_task_popup").style.display =  "none";
 		document.querySelector("#task_selected").style.display =  "none";
+
+		const completed_list = document.querySelector("#completed_tasks_list");
+		while (completed_list.children.length > 0) {
+			completed_list.children[0].remove();
+		}
 	}
 
 	async function toggleProjectTaskView(e) {

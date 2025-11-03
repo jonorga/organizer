@@ -43,9 +43,11 @@ Build list:
 		- Write a loop that adds "date: undefined" to all tasks
 	D) DONE Remember whether project was folded or not
 		- Write a loop that adds "folded: false" to all project
-3) See completed tasks
-	- Create scrollable list/div section in project pop up
-	- Populate this with "completed tasks" info on project open
+3) DONE See completed tasks
+	- DONE Create scrollable list/div section in project pop up
+	- DONE Populate this with "completed tasks" info on project open
+		- DONE On popup open, populate with tasks
+		- DONE On popup close, delete tasks from DOM
 4) Add notes section
 	- Show notes above tasks in project div
 	- Make section in project popup that is large input field

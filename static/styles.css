@@ -11,6 +11,13 @@
 	min-height: 100%;
 }
 
+#completed_tasks_list {
+	color: white;
+	border: 1px solid white;
+	max-height: 20vh;
+	overflow-y: scroll;
+}
+
 .fold_toggle {
 	background-color: rgba(0,0,0,0);
 	border: 1px solid black;
