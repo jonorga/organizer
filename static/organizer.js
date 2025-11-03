@@ -62,7 +62,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = cat_proj[1];
 		const idx = cat_proj[2]
 		
-		
+		console.log(app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"]);
+		for (const item of app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"]) {
+			console.log(item);
+			if (item["task"] == task) {
+				alert("Dupe task");
+				return;
+			}
+		}
 		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
 		refreshPage(app_data);
 		saveData(app_data);

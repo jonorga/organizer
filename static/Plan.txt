@@ -1,0 +1,95 @@
+All tasks:
+- Having multiple tasks with the same content causes issues
+- See completed tasks
+- Add notes section to tasks
+- Have file attachment for projects
+- Project based priorities
+- Mobile phone version
+- Have tasks tied with dates
+- Remove a task (not complete) from list
+- When task is folded just see part of note and number of tasks
+- Remember whether task was folded or not
+
+
+Data schema:
+- Having multiple tasks with the same content causes issues
+- Add notes section to tasks
+- Have file attachment for projects
+- Project based priorities
+- Have tasks tied with dates
+- Remember whether task was folded or not
+
+
+Display:
+- See completed tasks
+- Add notes section to tasks
+- Have file attachment for projects
+- Project based priorities
+- Have tasks tied with dates
+- Remove a task (not complete) from list
+- When task is folded just see part of note and number of tasks
+- Mobile phone version
+
+
+Build list:
+1) DONE Multiple tasks with the same content cause issues: reject dupes
+	- In `submitProjectTask` function scan through tasks for any matches, if found, reject and give notice
+2) Have the following triggered by a button
+	A) Add note section (schema)
+		- Write loop to add empty ("", string) notes attribute to each project
+	B) Project based priorities
+		- Write a loop that adds "priority: 1" to projects
+	C) tasks tied with dates
+		- Write a loop that adds "date: undefined" to all tasks
+	D) Remember whether project was folded or not
+		- Write a loop that adds "folded: false" to all project
+3) See completed tasks
+	- Create scrollable list/div section in project pop up
+	- Populate this with "completed tasks" info on project open
+4) Add notes section
+	- Show notes above tasks in project div
+	- Make section in project popup that is large input field
+	- Populate with note content
+	- Create button that updates the notes
+5) File attachment for projects
+	- Create file upload button
+	- Have python check for existing project folder
+		- If none found, create one
+	- Save file to project folder
+	- Show list of saved files from dir scan (check if dir exists first), query when popup opened
+	- Have view button for images and text
+	- Have download button for all files
+	- Have delete button for all files
+	- Write delete python side
+	- Write download python side
+	- On project delete, also delete the file folder
+6) Project based priority
+	- Create shift left/right button in project popup
+	- left/right button flips idx with neighboring project
+	- Project priority drop down in project popup
+	- Changing priority updates JSON
+	- Project is colored based on priority
+7) Tasks tied with dates
+	- Task popup: date dropdown field
+	- On change, update JSON with new date
+	- In task text, have date at beginning, if date is before current, have task grayed out, otherwise red
+8) Remove a task (not completed)
+	- Make delete button in task popup
+	- On click, remove from list but dont add to completed tasks
+9) Task folding
+	- Check "folded" attr to determine if task show be folded on load
+	- When folding/unfolding: update task JSON attribute
+	- Alter folded to show preview of note and number of tasks in project
+10) Styles
+	- Organize popup windows
+	- General tasks: have category, project, and task be better differentiated
+	- Mobile version
+
+
+
+
+
+
+
+
+	
