@@ -18,6 +18,14 @@
 	overflow-y: scroll;
 }
 
+.notes_div {
+	background-color: var(--bright2);
+	padding: 2px;
+	margin-top: 2px;
+	border-radius: 8px;
+	color: white;
+}
+
 .fold_toggle {
 	background-color: rgba(0,0,0,0);
 	border: 1px solid black;

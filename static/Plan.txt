@@ -48,12 +48,12 @@ Build list:
 	- DONE Populate this with "completed tasks" info on project open
 		- DONE On popup open, populate with tasks
 		- DONE On popup close, delete tasks from DOM
-4) Add notes section
-	- Show notes above tasks in project div
-	- Make section in project popup that is large input field
-	- Populate with note content
-	- Create button that updates the notes
-5) File attachment for projects
+4) DONE Add notes section
+	- DONE Show notes above tasks in project div
+	- DONE Make section in project popup that is large input field
+	- DONE Populate with note content
+	- DONE Create button that updates the notes
+5) IGNORE File attachment for projects
 	- Create file upload button
 	- Have python check for existing project folder
 		- If none found, create one

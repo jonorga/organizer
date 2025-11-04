@@ -131,6 +131,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		saveData(app_data);
 	}
+
+	function saveNote() {
+		const note = document.querySelector("#project_notes_input").value;
+		const description = document.querySelector("#add_project_task_popup").getAttribute("description").split("_");
+		const category = description[0];
+		const idx = description[2];
+
+
+		app_data["categories"][unhyphenatedName(category)][idx]["notes"] = note;
+		saveData(app_data);
+		refreshPage(app_data);
+	}
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
@@ -292,12 +304,15 @@ document.addEventListener("DOMContentLoaded", function () {
 		const idx = parent_elem.getAttribute("idx");
 
 
-		const tasks_done = app_data["categories"][unhyphenatedName(category)][idx]["tasks_done"]
+		const tasks_done = app_data["categories"][unhyphenatedName(category)][idx]["tasks_done"];
 		for (const task of tasks_done) {
 			const temp = document.createElement("li");
 			temp.innerText = task;
 			document.querySelector("#completed_tasks_list").appendChild(temp);
 		}
+
+		const notes = app_data["categories"][unhyphenatedName(category)][idx]["notes"];
+		document.querySelector("#project_notes_input").value = notes;
 
 		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
 		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`);
@@ -436,7 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	function createProject(project, category, idx) {
+	function createProject(project, category, idx, notes) {
 		const project_div = document.createElement("div");
 		project_div.classList.add("project_container");
 		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
@@ -457,10 +472,20 @@ document.addEventListener("DOMContentLoaded", function () {
 		header_div.appendChild(project_title);
 		header_div.appendChild(fold_toggle);
 
+
+
 		const task_div = document.createElement("div");
 		task_div.classList.add("project_task_container");
 
 		project_div.appendChild(header_div);
+
+		if (notes.length > 0) {
+			const notes_div = document.createElement("div");
+			notes_div.classList.add("notes_div");
+			notes_div.innerText = notes;
+			project_div.appendChild(notes_div);	
+		}
+
 		project_div.appendChild(task_div);
 
 		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
@@ -509,7 +534,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			for (const idx in projects) {
 				const project = projects[idx]["project"];
 				const tasks = projects[idx]["tasks_todo"];
-				createProject(project, category, idx);
+				const notes = projects[idx]["notes"];
+				createProject(project, category, idx, notes);
 				for (const task of tasks) {
 					addProjectTask(category, project, task["task"], task["spot"], task["priority"]);
 					const spot = task["spot"];
@@ -537,6 +563,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Region EventListeners
+	document.querySelector("#save_note_btn").addEventListener("click", saveNote);
 	document.querySelector("#delete_project_btn").addEventListener("click", deleteProject);
 	document.querySelector("#delete_category_btn").addEventListener("click", deleteCategory);
 
