@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				return;
 			}
 		}
-		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1});
+		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1, "date": undefined});
 		refreshPage(app_data);
 		saveData(app_data);
 		closePopup();
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#add_project_name").value = "";
 		closePopup();
 		const project_key = Object.keys(app_data["categories"][unhyphenatedName(category)]).length;
-		app_data["categories"][unhyphenatedName(category)][project_key] = {"project": project, "tasks_todo": [], "tasks_done": []};
+		app_data["categories"][unhyphenatedName(category)][project_key] = {"project": project, "tasks_todo": [], "tasks_done": [], "notes": "", "priority": 1, "folded": false};
 		refreshPage(app_data);
 		saveData(app_data);
 	}
