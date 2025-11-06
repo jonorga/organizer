@@ -66,8 +66,8 @@ Build list:
 	- Write download python side
 	- On project delete, also delete the file folder
 6) Project based priority
-	- Create shift left/right button in project popup
-	- left/right button flips idx with neighboring project
+	- DONE Create shift left/right button in project popup
+	- DONE left/right button flips idx with neighboring project
 	- Project priority drop down in project popup
 	- Changing priority updates JSON
 	- Project is colored based on priority

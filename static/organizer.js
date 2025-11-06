@@ -143,6 +143,50 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 		refreshPage(app_data);
 	}
+
+	function projectShift(e) {
+		const left = e.srcElement.id.includes("left");
+		const idx = e.srcElement.parentElement.getAttribute("description").split("_")[2];
+		const category = unhyphenatedName(e.srcElement.parentElement.getAttribute("description").split("_")[0]);
+
+		if (left) {
+			// Check if current IDX is 0, if so just reject
+			if (idx == 0) return;
+			const temp1 = app_data["categories"][category][idx];
+			const temp2 = app_data["categories"][category][idx - 1];
+			console.log(JSON.stringify(app_data["categories"][category]));
+
+			app_data["categories"][category][idx] = temp1;
+			app_data["categories"][category][idx - 1] = temp2;
+			
+			delete app_data["categories"][category][idx - 1];
+			delete app_data["categories"][category][idx];
+			
+			app_data["categories"][category][idx] = temp2;
+			app_data["categories"][category][idx - 1] = temp1;
+			console.log(JSON.stringify(app_data["categories"][category]));
+
+			// console.log(app_data);
+
+		}
+		else {
+			// Check if current IDX is largest IDX in category, if so just reject
+			const highest_idx = Math.max(...Object.keys(app_data["categories"][category]).map(Number));
+			if (idx == highest_idx) return;
+			const temp1 = app_data["categories"][category][idx];
+			const temp2 = app_data["categories"][category][Number(idx) + 1];
+
+			delete app_data["categories"][category][idx];
+			delete app_data["categories"][category][Number(idx) + 1];
+
+			app_data["categories"][category][idx] = temp2;
+			app_data["categories"][category][Number(idx) + 1] = temp1;
+
+		}
+		saveData(app_data);
+		refreshPage(app_data);
+		closePopup();
+	}
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
@@ -584,6 +628,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#add_category_submit").addEventListener("click", addCategorySubmit);
 
 	document.querySelector("#update_schema_query").addEventListener("click", updateSchema);
+	document.querySelector("#project_left_btn").addEventListener("click", projectShift);
+	document.querySelector("#project_right_btn").addEventListener("click", projectShift);
 // Region End EventListeners
 
 	getData();
