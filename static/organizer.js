@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (idx == 0) return;
 			const temp1 = app_data["categories"][category][idx];
 			const temp2 = app_data["categories"][category][idx - 1];
-			console.log(JSON.stringify(app_data["categories"][category]));
+			
 
 			app_data["categories"][category][idx] = temp1;
 			app_data["categories"][category][idx - 1] = temp2;
@@ -164,10 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
 			
 			app_data["categories"][category][idx] = temp2;
 			app_data["categories"][category][idx - 1] = temp1;
-			console.log(JSON.stringify(app_data["categories"][category]));
-
-			// console.log(app_data);
-
 		}
 		else {
 			// Check if current IDX is largest IDX in category, if so just reject
@@ -183,6 +179,17 @@ document.addEventListener("DOMContentLoaded", function () {
 			app_data["categories"][category][Number(idx) + 1] = temp1;
 
 		}
+		saveData(app_data);
+		refreshPage(app_data);
+		closePopup();
+	}
+
+	function projectPriorityTask(e) {
+		const priority_val = e.srcElement.value == "Low" ? 1 : e.srcElement.value == "Medium" ? 2 : 3;
+		const category = unhyphenatedName(e.srcElement.parentElement.getAttribute("description").split("_")[0]);
+		const idx = e.srcElement.parentElement.getAttribute("description").split("_")[2];
+
+		app_data["categories"][category][idx]["priority"] = priority_val;		
 		saveData(app_data);
 		refreshPage(app_data);
 		closePopup();
@@ -279,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		closePopup();
 	}
 
-	function priorityToggle(obj) {
+	function taskPriorityToggle(obj) {
 		
 		const new_priority = obj.target.value == "High" ? 3 : obj.target.value == "Medium" ? 2 : 1;
 		const parent = obj.srcElement.parentElement;
@@ -357,6 +364,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		const notes = app_data["categories"][unhyphenatedName(category)][idx]["notes"];
 		document.querySelector("#project_notes_input").value = notes;
+
+		const priority = app_data["categories"][unhyphenatedName(category)][idx]["priority"];
+		document.querySelector("#project_priority").value = priority == 3 ? "High" : priority == 2 ? "Medium" : "Low";
 
 		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
 		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`);
@@ -495,11 +505,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	function createProject(project, category, idx, notes) {
+	function createProject(project, category, idx, notes, priority) {
 		const project_div = document.createElement("div");
 		project_div.classList.add("project_container");
 		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
 		project_div.setAttribute("idx", idx);
+		if (priority == 2) {
+			project_div.classList.add("project_priority_medium");
+		}
+		else if (priority == 3) {
+			project_div.classList.add("project_priority_high");
+		}
 
 		const project_title = document.createElement("span");
 		project_title.innerText = project;
@@ -579,7 +595,8 @@ document.addEventListener("DOMContentLoaded", function () {
 				const project = projects[idx]["project"];
 				const tasks = projects[idx]["tasks_todo"];
 				const notes = projects[idx]["notes"];
-				createProject(project, category, idx, notes);
+				const priority = projects[idx]["priority"];
+				createProject(project, category, idx, notes, priority);
 				for (const task of tasks) {
 					addProjectTask(category, project, task["task"], task["spot"], task["priority"]);
 					const spot = task["spot"];
@@ -614,7 +631,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#add_project_submit").addEventListener("click", addProjectSubmit);
 
 	document.querySelector("#add_task_to_general").addEventListener("click", onOffGeneralToggle);
-	document.querySelector("#task_priority").onchange = priorityToggle;
+	document.querySelector("#task_priority").onchange = taskPriorityToggle;
+	document.querySelector("#project_priority").onchange = projectPriorityTask;
+
 
 	document.querySelector("#add_category_query").addEventListener("click", function () {
 		document.querySelector("#add_category_popup").style.display =  "block";

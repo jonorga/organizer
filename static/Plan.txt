@@ -65,12 +65,13 @@ Build list:
 	- Write delete python side
 	- Write download python side
 	- On project delete, also delete the file folder
-6) Project based priority
+6) DONE Project based priority
 	- DONE Create shift left/right button in project popup
 	- DONE left/right button flips idx with neighboring project
-	- Project priority drop down in project popup
-	- Changing priority updates JSON
-	- Project is colored based on priority
+	- DONE Project priority drop down in project popup
+	- DONE Changing priority updates JSON
+	- DONE On open of popup, set dropdown val based on priority
+	- DONE Project is colored based on priority
 7) Tasks tied with dates
 	- Task popup: date dropdown field
 	- On change, update JSON with new date
