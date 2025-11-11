@@ -72,10 +72,13 @@ Build list:
 	- DONE Changing priority updates JSON
 	- DONE On open of popup, set dropdown val based on priority
 	- DONE Project is colored based on priority
-7) Tasks tied with dates
-	- Task popup: date dropdown field
-	- On change, update JSON with new date
-	- In task text, have date at beginning, if date is before current, have task grayed out, otherwise red
+7) DONE Tasks tied with dates
+	- DONE Task popup: date dropdown field
+	- DONE On change, update JSON with new date
+	- DONE Popup gets date from data
+	- DONE In task text, have date at beginning, if date is before current, have task grayed out, otherwise red
+		- `addProjectTask` just adds task to innertext
+		- `selectTask` just grabs task from innertext
 8) Remove a task (not completed)
 	- Make delete button in task popup
 	- On click, remove from list but dont add to completed tasks

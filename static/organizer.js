@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				return;
 			}
 		}
-		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1, "date": undefined});
+		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1, "date": null});
 		refreshPage(app_data);
 		saveData(app_data);
 		closePopup();
@@ -123,12 +123,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 				for (const item in app_data["categories"][_cat][_proj]["tasks_todo"]) {
 					if (!("date" in app_data["categories"][_cat][_proj]["tasks_todo"][item]))  {
-						app_data["categories"][_cat][_proj]["tasks_todo"][item]["date"] = undefined;
+						app_data["categories"][_cat][_proj]["tasks_todo"][item]["date"] = null;
 					}
 				}
 			}
 		}
-
 		saveData(app_data);
 	}
 
@@ -194,9 +193,34 @@ document.addEventListener("DOMContentLoaded", function () {
 		refreshPage(app_data);
 		closePopup();
 	}
+
+	function saveTaskDate(category, project, idx, task, date) {
+		for (const item in app_data["categories"][category][idx]["tasks_todo"]) {
+			if (app_data["categories"][category][idx]["tasks_todo"][item]["task"] == task) {
+				app_data["categories"][category][idx]["tasks_todo"][item]["date"] = date;
+			}
+		}
+		saveData(app_data);
+		refreshPage(app_data);
+	}
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
+	function updateTaskDate(e) {
+		const info = e.srcElement.parentElement;
+		const category = info.getAttribute("data-category");
+		const project = info.getAttribute("data-project");
+		const idx = info.getAttribute("data-idx");
+		const task = info.getAttribute("data-task");
+		const val = document.querySelector("#task_date").value;
+		if (val == "") {
+			saveTaskDate(category, project, idx, task, null);
+		}
+		else {
+			saveTaskDate(category, project, idx, task, val);
+		}
+	}
+
 	async function deleteFinishedTask(e) {
 		const info = e.srcElement.parentElement;
 		const delete_spot = info.getAttribute("data-spot");
@@ -246,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 	}
 
-	function openTaskPopup(task, priority, category, project, idx, on_general, spot) {
+	function openTaskPopup(task, priority, category, project, idx, on_general, spot, date) {
 		const task_selected_div = document.querySelector("#task_selected");
 		task_selected_div.style.display =  "block";
 		document.querySelector("#panel_popup").style.display = "block";
@@ -258,6 +282,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_selected_div.setAttribute("data-idx", idx);
 		task_selected_div.setAttribute("data-on-general", on_general);
 		task_selected_div.setAttribute("data-spot", spot);
+		document.querySelector("#task_date").value = date;
 	}
 
 	function onOffGeneralToggle() {
@@ -310,17 +335,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		const parent_elem = e.srcElement.parentElement.parentElement;
 		const info = parent_elem.id.split("_");
-		const task = e.srcElement.innerText;
+		const task = e.srcElement.getAttribute("data-task");
 		const category = unhyphenatedName(info[1]);
 		const project = unhyphenatedName(info[2]);
 		const idx = parent_elem.getAttribute("idx");
 		const priority = e.srcElement.getAttribute("data-priority");
 		const spot = e.srcElement.getAttribute("data-spot") || 0;
+		const date = e.srcElement.getAttribute("data-date") || 0;
 
 		const on_general = [...e.srcElement.classList].includes("on_general");
 
 		
-		openTaskPopup(task, priority, category, project, idx, on_general, spot);
+		openTaskPopup(task, priority, category, project, idx, on_general, spot, date);
 	}	
 
 	function deleteProject() {
@@ -553,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	function addProjectTask(category, project, task, spot, priority) {
+	function addProjectTask(category, project, task, spot, priority, date) {
 		const task_div = document.createElement("li");
 		task_div.classList.add("project_task");
 		if (priority == 3) task_div.classList.add("high_priority");
@@ -563,8 +589,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			task_div.setAttribute("data-spot", spot);
 		}
 		task_div.setAttribute("data-priority", priority);
+		task_div.setAttribute("data-date", date);
 		task_div.addEventListener("click", selectTask);
-		task_div.innerText = task;
+		task_div.setAttribute("data-task", task);
+		const date_part = date != null ? `${date} - ` : "";
+		task_div.innerText = date_part + task;
 
 		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
 		
@@ -598,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				const priority = projects[idx]["priority"];
 				createProject(project, category, idx, notes, priority);
 				for (const task of tasks) {
-					addProjectTask(category, project, task["task"], task["spot"], task["priority"]);
+					addProjectTask(category, project, task["task"], task["spot"], task["priority"], task["date"]);
 					const spot = task["spot"];
 					if (spot > 0) {
 						general_tasks["highest"] = general_tasks["highest"] < spot ? spot : general_tasks["highest"];
@@ -649,6 +678,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#update_schema_query").addEventListener("click", updateSchema);
 	document.querySelector("#project_left_btn").addEventListener("click", projectShift);
 	document.querySelector("#project_right_btn").addEventListener("click", projectShift);
+
+	document.querySelector("#task_date").addEventListener("change", updateTaskDate);
 // Region End EventListeners
 
 	getData();
