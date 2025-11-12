@@ -79,9 +79,9 @@ Build list:
 	- DONE In task text, have date at beginning, if date is before current, have task grayed out, otherwise red
 		- `addProjectTask` just adds task to innertext
 		- `selectTask` just grabs task from innertext
-8) Remove a task (not completed)
-	- Make delete button in task popup
-	- On click, remove from list but dont add to completed tasks
+8) DONE Remove a task (not completed)
+	- DONE Make delete button in task popup
+	- DONE On click, remove from list but dont add to completed tasks
 9) Task folding
 	- Check "folded" attr to determine if task show be folded on load
 	- When folding/unfolding: update task JSON attribute

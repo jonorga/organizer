@@ -206,6 +206,29 @@ document.addEventListener("DOMContentLoaded", function () {
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
+	function deleteTask(e) {
+		const info = e.srcElement.parentElement;
+		const delete_spot = info.getAttribute("data-spot");
+		const category = info.getAttribute("data-category")
+		const project = info.getAttribute("data-project");
+		const idx = info.getAttribute("data-idx");
+		const task = info.getAttribute("data-task");
+
+		let i = 0;
+		while (i < app_data["categories"][category][idx]["tasks_todo"].length) {
+			if (app_data["categories"][category][idx]["tasks_todo"][i]["task"] == task) {
+				app_data["categories"][category][idx]["tasks_todo"].splice(i, 1);
+			}
+			i++;
+		}
+
+		if (delete_spot != 0) reconcileTaskSpots(delete_spot);
+
+		refreshPage(app_data);
+		saveData(app_data);
+		closePopup();
+	}
+
 	function updateTaskDate(e) {
 		const info = e.srcElement.parentElement;
 		const category = info.getAttribute("data-category");
@@ -248,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		reconcileTaskSpots(delete_spot);
 		
-		refreshPage(app_data, delete_spot);
+		refreshPage(app_data);
 		saveData(app_data);
 	}
 
@@ -680,6 +703,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#project_right_btn").addEventListener("click", projectShift);
 
 	document.querySelector("#task_date").addEventListener("change", updateTaskDate);
+
+	document.querySelector("#delete_task_button").addEventListener("click", deleteTask);
 // Region End EventListeners
 
 	getData();
