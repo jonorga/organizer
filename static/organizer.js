@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = cat_proj[1];
 		const idx = cat_proj[2]
 		
-		console.log(app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"]);
+
 		for (const item of app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"]) {
 			console.log(item);
 			if (item["task"] == task) {
@@ -440,10 +440,16 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	async function toggleProjectTaskView(e) {
-		const project = e.srcElement.parentElement.parentElement;
-		const q_select = project.id;
+		const info = e.srcElement.parentElement.parentElement;
+		const q_select = info.id;
+		const info_parse = info.id.split("_");
+		const category = unhyphenatedName(info_parse[1]);
+		const project = unhyphenatedName(info_parse[2]);
+		const idx = info.getAttribute("idx");
 		const target_elem = document.querySelector(`#${q_select} > div.project_task_container`);
 		const speed = 5;
+
+		app_data["categories"][category][idx]["folded"] = !target_elem.hasAttribute("rolled_up");
 		
 		
 		if (target_elem.hasAttribute("rolled_up")) {
@@ -458,7 +464,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				target_elem.style.height = `${i}px`;
 				i += increment;
 			}
-
+			e.srcElement.innerText
 			target_elem.removeAttribute("rolled_up");
 		}
 		else {
@@ -472,6 +478,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			target_elem.style.height = 0;
 			target_elem.setAttribute("rolled_up", "");
 		}
+
+		refreshPage(app_data);
+		saveData(app_data);
 	}
 // Region End PageActions ===============================================================	
 
@@ -554,7 +563,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	function createProject(project, category, idx, notes, priority) {
+	function createProject(project, category, idx, notes, priority, folded, task_count) {
 		const project_div = document.createElement("div");
 		project_div.classList.add("project_container");
 		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
@@ -586,6 +595,18 @@ document.addEventListener("DOMContentLoaded", function () {
 		const task_div = document.createElement("div");
 		task_div.classList.add("project_task_container");
 
+		const preview_div = document.createElement("div");
+		preview_div.innerText = `Tasks: ${task_count}`;
+
+		if (folded) {
+			task_div.style.height = 0;
+			task_div.setAttribute("rolled_up", "");
+			fold_toggle.innerHTML = "&#8673;";
+		}
+		else {
+			preview_div.style.display = "none";
+		}
+
 		project_div.appendChild(header_div);
 
 		if (notes.length > 0) {
@@ -595,7 +616,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			project_div.appendChild(notes_div);	
 		}
 
+		
+
+
 		project_div.appendChild(task_div);
+		project_div.appendChild(preview_div);
 
 		document.querySelector(`#cat_${category.replaceAll(" ", "-")}_content`).appendChild(project_div);
 	}
@@ -648,7 +673,9 @@ document.addEventListener("DOMContentLoaded", function () {
 				const tasks = projects[idx]["tasks_todo"];
 				const notes = projects[idx]["notes"];
 				const priority = projects[idx]["priority"];
-				createProject(project, category, idx, notes, priority);
+				const folded = projects[idx]["folded"];
+				const task_count = projects[idx]["tasks_todo"].length;
+				createProject(project, category, idx, notes, priority, folded, task_count);
 				for (const task of tasks) {
 					addProjectTask(category, project, task["task"], task["spot"], task["priority"], task["date"]);
 					const spot = task["spot"];

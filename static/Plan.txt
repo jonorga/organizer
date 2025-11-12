@@ -82,12 +82,15 @@ Build list:
 8) DONE Remove a task (not completed)
 	- DONE Make delete button in task popup
 	- DONE On click, remove from list but dont add to completed tasks
-9) Task folding
-	- Check "folded" attr to determine if task show be folded on load
-	- When folding/unfolding: update task JSON attribute
-	- Alter folded to show preview of note and number of tasks in project
+9) DONE Task folding
+	- DONE When folding/unfolding: update task JSON attribute
+	- DONE Check "folded" attr to determine if task show be folded on load
+	- DONE Alter folded to show preview of note and number of tasks in project
+		- DONE Have fit to div with note and task count
+		- As size switch happens also inversely change opacity between full view and folded
 10) Styles
 	- Organize popup windows
+	- Make project preview folding more smooth
 	- General tasks: have category, project, and task be better differentiated
 	- Mobile version
 
