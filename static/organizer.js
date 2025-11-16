@@ -145,8 +145,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function projectShift(e) {
 		const left = e.srcElement.id.includes("left");
-		const idx = e.srcElement.parentElement.getAttribute("description").split("_")[2];
-		const category = unhyphenatedName(e.srcElement.parentElement.getAttribute("description").split("_")[0]);
+		const idx = e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[2];
+		const category = unhyphenatedName(e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[0]);
 
 		if (left) {
 			// Check if current IDX is 0, if so just reject
@@ -185,8 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function projectPriorityTask(e) {
 		const priority_val = e.srcElement.value == "Low" ? 1 : e.srcElement.value == "Medium" ? 2 : 3;
-		const category = unhyphenatedName(e.srcElement.parentElement.getAttribute("description").split("_")[0]);
-		const idx = e.srcElement.parentElement.getAttribute("description").split("_")[2];
+		const category = unhyphenatedName(e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[0]);
+		const idx = e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[2];
 
 		app_data["categories"][category][idx]["priority"] = priority_val;		
 		saveData(app_data);
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function openTaskPopup(task, priority, category, project, idx, on_general, spot, date) {
 		const task_selected_div = document.querySelector("#task_selected");
-		task_selected_div.style.display =  "block";
+		task_selected_div.style.display =  "flex";
 		document.querySelector("#panel_popup").style.display = "block";
 		document.querySelector("#task_info").innerText = `Selected task: ${task}`;
 		document.querySelector("#task_priority").value = priority == 3 ? "High" : priority == 2 ? "Medium" : "Low";
@@ -422,7 +422,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function openCategoryPopup () {
-		document.querySelector("#add_project_popup").style.display =  "block";
+		document.querySelector("#add_project_popup").style.display =  "flex";
 		document.querySelector("#panel_popup").style.display = "block";
 	};
 
@@ -553,6 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const add_project_btn = document.createElement("button");
 		add_project_btn.innerHTML = "Add project";
 		add_project_btn.addEventListener("click", addProjectButton);
+		add_project_btn.classList.add("add_project_btn");
 		category_header.appendChild(add_project_btn);
 		
 
@@ -715,7 +716,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 	document.querySelector("#add_category_query").addEventListener("click", function () {
-		document.querySelector("#add_category_popup").style.display =  "block";
+		document.querySelector("#add_category_popup").style.display =  "flex";
 		document.querySelector("#panel_popup").style.display = "block";
 	});
 

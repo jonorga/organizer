@@ -90,6 +90,10 @@ Build list:
 		- As size switch happens also inversely change opacity between full view and folded
 10) Styles
 	- Organize popup windows
+		- DONE add Category
+		- DONE add Project
+		- DONE add task
+		- DONE selected task
 	- Make project preview folding more smooth
 	- General tasks: have category, project, and task be better differentiated
 	- Mobile version

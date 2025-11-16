@@ -19,37 +19,46 @@
 			</div>
 		</div>
 		<div id="panel_popup">
-			<button id="close_popup_btn">Close popup</button>
+			<button id="close_popup_btn">X</button>
 			<div id="add_category_popup" style="display: none;">
-				<p class="popup_text">Add category</p>
-				<input type="text" id="add_category_name">
+				<p class="popup_text" id="popup_category_header">Add category window</p>
+				<input type="text" id="add_category_name" placeholder="Category name...">
 				<button id="add_category_submit">Add Category</button>
 			</div>
 			<div id="add_project_popup" style="display: none;">
 				<p class="popup_text" id="popup_project_text">Add project to category: </p>
-				<input type="text" id="add_project_name">
-				<button id="add_project_submit">Add Project</button>
-				<button id="delete_category_btn">Delete Category</button>
+				<input type="text" id="add_project_name" placeholder="Project name...">
+				<button class="project_popup_btn" id="add_project_submit">Add Project</button>
+				<button class="project_popup_btn" id="delete_category_btn">Delete Category</button>
 			</div>
 			<div id="add_project_task_popup" style="display: none;">
-				<p class="popup_text" id="popup_project_task_text">Add task to project: </p>
-				<input type="text" id="add_project_task_name">
-				<button id="add_project_task_submit">Add Project Task</button>
-				<button id="delete_project_btn">Delete Project</button>
-				<textarea id="project_notes_input">
+				<div id="popup_projecttask_task">
+					<p class="popup_text" id="popup_project_task_text">Add task to project: </p>
+					<input type="text" id="add_project_task_name">
+					<button id="add_project_task_submit">Add Project Task</button>
+				</div>
+				<div id="popup_projecttask_proj">
 					
-				</textarea>
-				<button id="save_note_btn">Save note</button>
-				<button id="project_left_btn">Left</button>
-				<button id="project_right_btn">Right</button>
-				<select id="project_priority">
-					<option>High</option>
-					<option>Medium</option>
-					<option selected="selected">Low</option>
-				</select>
-				<p style="color:white;">Completed tasks</p>s
-				<div id="completed_tasks_list">
-					
+					<textarea id="project_notes_input">
+						
+					</textarea>
+					<button id="save_note_btn">Save note</button>
+					<div id="project_options">
+						<button id="project_left_btn"><</button>
+						<span style="color:white;">Shift project</span>
+						<button id="project_right_btn">></button>
+						<span style="color:white;">Project priority: </span>
+						<select id="project_priority">
+							<option>High</option>
+							<option>Medium</option>
+							<option selected="selected">Low</option>
+						</select>
+					</div>
+					<p style="color:white; text-align: center;">Completed tasks</p>
+					<div id="completed_tasks_list">
+						
+					</div>
+					<button id="delete_project_btn">Delete Project</button>
 				</div>
 			</div>
 			<div id="task_selected" style="display: none;">
@@ -62,6 +71,7 @@
 				</select>
 				<br>
 				<button id="add_task_to_general">Add/remove to general tasks</button>
+				<p style="text-align: center; color:white;">Task date:</p>
 				<input type="date" id="task_date">
 				<button id="delete_task_button">Delete task</button>
 			</div>
