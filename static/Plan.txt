@@ -88,15 +88,15 @@ Build list:
 	- DONE Alter folded to show preview of note and number of tasks in project
 		- DONE Have fit to div with note and task count
 		- As size switch happens also inversely change opacity between full view and folded
-10) Styles
-	- Organize popup windows
+10) DONE Styles
+	- DONE Organize popup windows
 		- DONE add Category
 		- DONE add Project
 		- DONE add task
 		- DONE selected task
-	- Make project preview folding more smooth
-	- General tasks: have category, project, and task be better differentiated
-	- Mobile version
+	- DONE Make project preview folding more smooth
+	- DONE General tasks: have category, project, and task be better differentiated
+	- IGNORED Mobile version
 
 
 

@@ -447,6 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = unhyphenatedName(info_parse[2]);
 		const idx = info.getAttribute("idx");
 		const target_elem = document.querySelector(`#${q_select} > div.project_task_container`);
+		const preview_elem = document.querySelector(`#${q_select} > div.proj_preview_div`);
 		const speed = 5;
 
 		app_data["categories"][category][idx]["folded"] = !target_elem.hasAttribute("rolled_up");
@@ -455,25 +456,33 @@ document.addEventListener("DOMContentLoaded", function () {
 		if (target_elem.hasAttribute("rolled_up")) {
 			target_elem.style.height = `100%`;
 			const goal_height = target_elem.offsetHeight;
+			const preview_full = preview_elem.offsetHeight;
 			target_elem.style.height = 0;
 			const increment = goal_height / 100;
+			const prev_increment = preview_full / 100;
 			let i = 0;
 			
-			while (i < goal_height) {
+			while (i < 100) {
 				await delay(speed);
-				target_elem.style.height = `${i}px`;
-				i += increment;
+				target_elem.style.height = `${i * increment}px`;
+				preview_elem.style.height = `${(100 - i) * prev_increment}px`;
+				preview_elem.style.opacity = (100 - i) / 100;
+				
+				i += 1;
 			}
-			e.srcElement.innerText
+			preview_elem.style.height = `0px`;
 			target_elem.removeAttribute("rolled_up");
 		}
 		else {
-			let i = target_elem.offsetHeight;
-			const increment = i / 100;
+			
+
+
+			let i = 100;
+			const increment = target_elem.offsetHeight / 100;
 			while (i > 0) {
 				await delay(speed);
-				target_elem.style.height = `${i}px`;
-				i -= increment;
+				target_elem.style.height = `${i * increment}px`;
+				i -= 1;
 			}
 			target_elem.style.height = 0;
 			target_elem.setAttribute("rolled_up", "");
@@ -522,13 +531,21 @@ document.addEventListener("DOMContentLoaded", function () {
 		promote_btn.id = `promote_${spot}`;
 
 		const task_text_div = document.createElement("div");
+
 		task_text_div.classList.add("general_task_text");
 		const task_text = document.createElement("p");
+		task_text.style.borderBottom = "1px solid rgba(0,0,0,0.5)"
 		task_text.innerText = text;
-		const task_category = document.createElement("p");
-		task_category.innerText = category_project;
+		const task_category = document.createElement("span");
+		task_category.style.marginRight = "5px";
+		task_category.style.fontWeight = "bold";
+		const task_project = document.createElement("span");
+		task_project.style.fontStyle = "italic";
+		task_category.innerText = category;
+		task_project.innerText = project;
 		task_text_div.appendChild(task_text);
 		task_text_div.appendChild(task_category);
+		task_text_div.appendChild(task_project);
 
 		div.appendChild(checkbox);
 		div.appendChild(task_text_div);
@@ -597,6 +614,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_div.classList.add("project_task_container");
 
 		const preview_div = document.createElement("div");
+		preview_div.classList.add("proj_preview_div");
 		preview_div.innerText = `Tasks: ${task_count}`;
 
 		if (folded) {
