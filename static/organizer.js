@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Region Helper ==========================================================
 	function unhyphenatedName(name) { return name.replaceAll("-", " ") }
+	function sortNumbers(a, b) { return a - b; }
 	const delay = ms => new Promise(res => setTimeout(res, ms));
 // End Region Helper ======================================================
 
@@ -43,6 +44,35 @@ document.addEventListener("DOMContentLoaded", function () {
 					task_["spot"] = task_["spot"] >= delete_spot ? task_["spot"] - 1: task_["spot"];
 				}
 			}
+		}
+	}
+
+	function reconcileProjectSpots() {
+		let on_main_list = [];
+		for (const category_ in app_data["categories"]) {
+			let counter = 0;
+			let new_cat_projects = {};
+			for (const idx_ in app_data["categories"][category_]) {
+				for (const task in app_data["categories"][category_][idx_]["tasks_todo"]) {
+					if (app_data["categories"][category_][idx_]["tasks_todo"][task]["spot"] != 0) {
+						on_main_list.push(Number(app_data["categories"][category_][idx_]["tasks_todo"][task]["spot"]));
+					}
+				}
+				new_cat_projects[counter] = app_data["categories"][category_][idx_];
+				counter++;
+			}
+			app_data["categories"][category_] = new_cat_projects;
+		}
+
+		on_main_list.sort(sortNumbers);
+		let counter = 1;
+		for (const num of on_main_list) {
+			if (counter != num) {
+				reconcileTaskSpots(counter);
+				counter++;
+			}
+			counter++;
+			
 		}
 	}
 
@@ -86,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function promoteGeneralTask(e) {
-		const lower_spot = e.srcElement.id.split("_")[1];
+		const lower_spot = Number(e.srcElement.id.split("_")[1]);
 		if (lower_spot == 1) return;
 		const upper_spot = lower_spot - 1;
 
@@ -377,6 +407,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const category = unhyphenatedName(info[0]);
 		const idx = info[2];
 		delete app_data["categories"][category][idx];
+		
+		reconcileProjectSpots();
 		closePopup();
 		refreshPage(app_data);
 		saveData(app_data);
@@ -667,8 +699,26 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector(`#${parent_id} > div.project_task_container`).appendChild(task_div);
 	}
 // Region End PageBuild ================================================================
+	function debugData() {
+		let on_main_list = [];
+		for (const category in app_data["categories"]) {
+			let idxs = ""
+			for (const idx in app_data["categories"][category]) {
+				idxs += `${idx} `
+				const project_tasks = app_data["categories"][category][idx];
+				for (const task in project_tasks["tasks_todo"]) {
+					if (project_tasks["tasks_todo"][task]["spot"] != 0) {
+						on_main_list.push(project_tasks["tasks_todo"][task]["spot"]);
+					}
+				}
+			}
+			console.log(`${category} - ${idxs}`);
+		}
+		console.log(on_main_list);
+	}
 
 	function refreshPage(data) {
+		//debugData();
 		const existing_tasks = document.getElementsByClassName("general_task");
 		let counter = 0;
 		while (counter < existing_tasks.length) {
