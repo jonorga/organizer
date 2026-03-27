@@ -48,22 +48,46 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function reconcileProjectSpots() {
+		/*
+			When a project is deleted, or project priority is shifted, make sure all project indices
+			are ordinal and no missing spots. 
+		*/
+		// This variable will be used to make sure the tasks on the general list dont cause an error with
+		// a missing spot
 		let on_main_list = [];
 		for (const category_ in app_data["categories"]) {
-			let counter = 0;
-			let new_cat_projects = {};
+			let new_cat_projects = {
+				"0": {},
+				"1": {},
+				"2": {},
+				"3": {}
+			};
 			for (const idx_ in app_data["categories"][category_]) {
 				for (const task in app_data["categories"][category_][idx_]["tasks_todo"]) {
 					if (app_data["categories"][category_][idx_]["tasks_todo"][task]["spot"] != 0) {
 						on_main_list.push(Number(app_data["categories"][category_][idx_]["tasks_todo"][task]["spot"]));
 					}
 				}
-				new_cat_projects[counter] = app_data["categories"][category_][idx_];
-				counter++;
+				// This will account for any deleted projects
+				const project_priority = app_data["categories"][category_][idx_]["priority"];
+				const project_spot = Object.keys(new_cat_projects[project_priority]).length;
+				new_cat_projects[project_priority][project_spot] = app_data["categories"][category_][idx_];
 			}
-			app_data["categories"][category_] = new_cat_projects;
+
+			let to_data_projects = {}
+			let counter = 0;
+			const project_statuses = [3,2,1,0];
+			for (const status of project_statuses) {
+				for (const temp_project of Object.keys(new_cat_projects[status])) {
+					to_data_projects[counter] = new_cat_projects[status][temp_project];
+					counter++;
+				}
+			}
+
+			app_data["categories"][category_] = to_data_projects;
 		}
 
+		// This actually sorts and resets the task spots
 		on_main_list.sort(sortNumbers);
 		let counter = 1;
 		for (const num of on_main_list) {
@@ -233,7 +257,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		const category = unhyphenatedName(e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[0]);
 		const idx = e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[2];
 
-		app_data["categories"][category][idx]["priority"] = priority_val;		
+		app_data["categories"][category][idx]["priority"] = priority_val;
+		reconcileProjectSpots();		
 		saveData(app_data);
 		refreshPage(app_data);
 		closePopup();
