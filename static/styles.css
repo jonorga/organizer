@@ -183,6 +183,7 @@
 	border-radius: 5px;
 	margin: 5px;
 	background-color: var(--bright5);
+	flex-wrap: wrap;
 }
 
 #completed_tasks_list {
@@ -190,6 +191,10 @@
 	border: 1px solid white;
 	max-height: 20vh;
 	overflow-y: scroll;
+}
+
+.project_priority_inactive {
+	background-color: gray;
 }
 
 .project_priority_medium {
@@ -352,9 +357,11 @@ button {
 .category_content {
 	display: flex;
 	border-bottom: 1px solid var(--bright3);
+	border-right: 1px solid var(--bright3);
 	background-color: var(--blue);
-	overflow-x: auto;
-	scrollbar-color: grey rgba(0,0,0,0);
+	flex-wrap: wrap;
+	/*overflow-x: auto;
+	scrollbar-color: grey rgba(0,0,0,0);*/
 }
 
 .general_task {

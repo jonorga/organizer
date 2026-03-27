@@ -213,8 +213,23 @@ document.addEventListener("DOMContentLoaded", function () {
 		closePopup();
 	}
 
+	function parseProjectPriority(value, direction) {
+		if (direction == "decode") {
+			if (value == 0) return "Inactive";
+			if (value == 1) return "Low";
+			if (value == 2) return "Medium";
+			if (value == 3) return "High";
+		}
+		else { // direction is encode
+			if (value == "Inactive") return 0;
+			if (value == "Low") return 1;
+			if (value == "Medium") return 2;
+			if (value == "High") return 3;
+		}
+	}
+
 	function projectPriorityTask(e) {
-		const priority_val = e.srcElement.value == "Low" ? 1 : e.srcElement.value == "Medium" ? 2 : 3;
+		const priority_val = parseProjectPriority(e.srcElement.value, "encode");
 		const category = unhyphenatedName(e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[0]);
 		const idx = e.srcElement.parentElement.parentElement.parentElement.getAttribute("description").split("_")[2];
 
@@ -328,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_selected_div.style.display =  "flex";
 		document.querySelector("#panel_popup").style.display = "block";
 		document.querySelector("#task_info").innerText = `Selected task: ${task}`;
-		document.querySelector("#task_priority").value = priority == 3 ? "High" : priority == 2 ? "Medium" : "Low";
+		document.querySelector("#task_priority").value = parseProjectPriority(priority, "decode");
 		task_selected_div.setAttribute("data-task", task);
 		task_selected_div.setAttribute("data-category", category);
 		task_selected_div.setAttribute("data-project", project);
@@ -366,7 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function taskPriorityToggle(obj) {
 		
-		const new_priority = obj.target.value == "High" ? 3 : obj.target.value == "Medium" ? 2 : 1;
+		const new_priority = parseProjectPriority(obj.target.value, "encode");
 		const parent = obj.srcElement.parentElement;
 		const category = parent.getAttribute("data-category");
 		const idx = parent.getAttribute("data-idx");
@@ -447,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.querySelector("#project_notes_input").value = notes;
 
 		const priority = app_data["categories"][unhyphenatedName(category)][idx]["priority"];
-		document.querySelector("#project_priority").value = priority == 3 ? "High" : priority == 2 ? "Medium" : "Low";
+		document.querySelector("#project_priority").value = parseProjectPriority(priority, "decode");
 
 		document.querySelector("#popup_project_task_text").innerText = `Add task to project: ${project}`;
 		document.querySelector("#add_project_task_popup").setAttribute("description", `${category}_${project}_${idx}`);
@@ -618,7 +633,10 @@ document.addEventListener("DOMContentLoaded", function () {
 		project_div.classList.add("project_container");
 		project_div.id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
 		project_div.setAttribute("idx", idx);
-		if (priority == 2) {
+		if (priority == 0) {
+			project_div.classList.add("project_priority_inactive");
+		}
+		else if (priority == 2) {
 			project_div.classList.add("project_priority_medium");
 		}
 		else if (priority == 3) {
