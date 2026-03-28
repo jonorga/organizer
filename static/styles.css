@@ -11,6 +11,10 @@
 	min-height: 100%;
 }
 
+#task_partial_input {
+	height: 20vh;
+}
+
 #delete_task_button {
 	background-color: rgba(255, 0, 0, 1);
 	border-radius: 5px;

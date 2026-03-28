@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				return;
 			}
 		}
-		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1, "date": null});
+		app_data["categories"][unhyphenatedName(category)][idx]["tasks_todo"].push({"task": task, "spot": 0, "priority": 1, "date": null, "partials": []});
 		refreshPage(app_data);
 		saveData(app_data);
 		closePopup();
@@ -273,6 +273,19 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 		refreshPage(app_data);
 	}
+
+	function saveTaskPartials(e) {
+		const elem = e.srcElement.parentElement;
+		const category = elem.getAttribute("data-category");
+		const project = elem.getAttribute("data-project");
+		const idx = elem.getAttribute("data-idx");
+		const task_idx = elem.getAttribute("data-taskidx");
+		const partials = document.querySelector("#task_partial_input").value.split("\n");
+
+		app_data["categories"][category][idx]["tasks_todo"][task_idx]["partials"] = partials;
+		saveData(app_data);
+		refreshPage(app_data);	
+	}
 // End Region DataFunctions ===========================================================
 
 // Region PageActions =================================================================
@@ -321,8 +334,19 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = info.getAttribute("data-project");
 		const idx = info.getAttribute("data-idx");
 		const task = info.getAttribute("data-content");
+		const task_idx = info.getAttribute("data-taskidx");
 
 		app_data["categories"][category][idx]["tasks_done"].push(task);
+
+		const next_finished_spot = Object.keys(app_data["completed"]["tasks"]).length;
+		const task_partials = app_data["categories"][category][idx]["tasks_todo"][task_idx]["partials"];
+		app_data["completed"]["tasks"][next_finished_spot] = {
+			"task": task,
+			"project": project,
+			"category": category,
+			"partials": task_partials,
+			"date": new Date().toJSON()
+		}
 
 		let opacity_val = 1;
 		while (opacity_val > 0) {
@@ -363,11 +387,16 @@ document.addEventListener("DOMContentLoaded", function () {
 		saveData(app_data);
 	}
 
-	function openTaskPopup(task, priority, category, project, idx, on_general, spot, date) {
+	function openTaskPopup(task, priority, category, project, idx, on_general, spot, date, task_idx) {
 		const task_selected_div = document.querySelector("#task_selected");
 		task_selected_div.style.display =  "flex";
 		document.querySelector("#panel_popup").style.display = "block";
 		document.querySelector("#task_info").innerText = `Selected task: ${task}`;
+
+		const task_partials = app_data["categories"][category][idx]["tasks_todo"][task_idx]["partials"];
+		document.querySelector("#task_partial_input").value = task_partials.join("\n");
+
+
 		document.querySelector("#task_priority").value = parseProjectPriority(priority, "decode");
 		task_selected_div.setAttribute("data-task", task);
 		task_selected_div.setAttribute("data-category", category);
@@ -375,6 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_selected_div.setAttribute("data-idx", idx);
 		task_selected_div.setAttribute("data-on-general", on_general);
 		task_selected_div.setAttribute("data-spot", spot);
+		task_selected_div.setAttribute("data-taskidx", task_idx);
 		document.querySelector("#task_date").value = date;
 	}
 
@@ -433,13 +463,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		const project = unhyphenatedName(info[2]);
 		const idx = parent_elem.getAttribute("idx");
 		const priority = e.srcElement.getAttribute("data-priority");
+		const task_idx = e.srcElement.getAttribute("data-taskidx");
 		const spot = e.srcElement.getAttribute("data-spot") || 0;
 		const date = e.srcElement.getAttribute("data-date") || 0;
 
 		const on_general = [...e.srcElement.classList].includes("on_general");
 
 		
-		openTaskPopup(task, priority, category, project, idx, on_general, spot, date);
+		openTaskPopup(task, priority, category, project, idx, on_general, spot, date, task_idx);
 	}	
 
 	function deleteProject() {
@@ -566,7 +597,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Region End PageActions ===============================================================	
 
 // Region PageBuild ====================================================================
-	function createGeneralTask(text, category_project, spot, idx, priority) {
+	function createGeneralTask(text, category_project, spot, idx, priority, task_idx) {
 		const div = document.createElement("div");
 		div.addEventListener("mouseover", function () {
 			document.querySelector(`#promote_${spot}`).style.display = "block";
@@ -588,6 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		div.setAttribute("data-idx", idx);
 		div.setAttribute("data-content", text);
 		div.setAttribute("priority", priority);
+		div.setAttribute("data-taskidx", task_idx);
 		
 
 		const checkbox = document.createElement("input");
@@ -721,7 +753,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-	function addProjectTask(category, project, task, spot, priority, date) {
+	function addProjectTask(category, project, task, spot, priority, date, task_idx, proj_idx) {
 		const task_div = document.createElement("li");
 		task_div.classList.add("project_task");
 		if (priority == 3) task_div.classList.add("high_priority");
@@ -734,8 +766,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_div.setAttribute("data-date", date);
 		task_div.addEventListener("click", selectTask);
 		task_div.setAttribute("data-task", task);
+		task_div.setAttribute("data-taskidx", task_idx);
 		const date_part = date != null ? `${date} - ` : "";
-		task_div.innerText = date_part + task;
+
+		//task_div.innerText = date_part + task;
+		const task_partials_raw = app_data["categories"][category][proj_idx]["tasks_todo"][task_idx]["partials"];
+		
+		const task_partials = task_partials_raw.length == 0 ? "" : `<br>- ${task_partials_raw.join("<br>- ")}`
+		task_div.innerHTML = `${date_part}${task}${task_partials}`
 
 		const parent_id = `cat_${category.replaceAll(" ", "-")}_${project.replaceAll(" ", "-")}`;
 		
@@ -762,6 +800,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function refreshPage(data) {
 		//debugData();
+
+		
+
 		const existing_tasks = document.getElementsByClassName("general_task");
 		let counter = 0;
 		while (counter < existing_tasks.length) {
@@ -788,8 +829,10 @@ document.addEventListener("DOMContentLoaded", function () {
 				const folded = projects[idx]["folded"];
 				const task_count = projects[idx]["tasks_todo"].length;
 				createProject(project, category, idx, notes, priority, folded, task_count);
+				let task_idx = 0
 				for (const task of tasks) {
-					addProjectTask(category, project, task["task"], task["spot"], task["priority"], task["date"]);
+					addProjectTask(category, project, task["task"], task["spot"], task["priority"], task["date"], task_idx, idx);
+					
 					const spot = task["spot"];
 					if (spot > 0) {
 						general_tasks["highest"] = general_tasks["highest"] < spot ? spot : general_tasks["highest"];
@@ -798,9 +841,11 @@ document.addEventListener("DOMContentLoaded", function () {
 							"category-project": `${category}-${project}`,
 							"spot": spot,
 							"idx": idx,
-							"priority": task["priority"]
+							"priority": task["priority"],
+							"task_idx": task_idx
 						};
 					}
+					task_idx++;
 				}	
 			}
 		}
@@ -808,14 +853,15 @@ document.addEventListener("DOMContentLoaded", function () {
 		let i = 1;
 		while (i <= general_tasks["highest"]) {
 			createGeneralTask(general_tasks[i]["task"], general_tasks[i]["category-project"], 
-				general_tasks[i]["spot"], general_tasks[i]["idx"], general_tasks[i]["priority"]);
+				general_tasks[i]["spot"], general_tasks[i]["idx"], general_tasks[i]["priority"],
+				general_tasks[i]["task_idx"]);
 			i++;
 		}
 	}
 
 
 // Region EventListeners
-	document.querySelector("#save_note_btn").addEventListener("click", saveNote);
+	document.querySelector("#project_notes_input").addEventListener("focusout", saveNote);
 	document.querySelector("#delete_project_btn").addEventListener("click", deleteProject);
 	document.querySelector("#delete_category_btn").addEventListener("click", deleteCategory);
 
@@ -844,6 +890,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.querySelector("#task_date").addEventListener("change", updateTaskDate);
 
 	document.querySelector("#delete_task_button").addEventListener("click", deleteTask);
+	document.querySelector("#task_partial_input").addEventListener("focusout", saveTaskPartials);
 // Region End EventListeners
 
 	getData();
