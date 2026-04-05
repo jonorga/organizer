@@ -297,6 +297,10 @@ button {
 	cursor: pointer;
 }
 
+.seperator {
+	text-align: center;
+}
+
 #add_category_query {
 	position: absolute;
 	top: 22px;
@@ -306,6 +310,10 @@ button {
 	border: 1px solid white;
 	border-radius: 5px;
 	padding: 5px;
+}
+
+#toggle_btn {
+	right: 140px;
 }
 
 #update_schema_query {
@@ -325,15 +333,19 @@ button {
 }
 
 #task_container {
-	width: 30%;
+	width: 25%;
 	border-right: 2px solid var(--bright5);
 	overflow-y: auto;
+	min-height: 500px
 }
 #category_container {
-	width: 70%;
+	width: 50%;
 	overflow-y: auto;
 }
-
+#complete_container {
+	width: 25%;
+	overflow-y: auto;
+}
 
 
 .sect_header {
@@ -370,11 +382,11 @@ button {
 
 .general_task {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 
 .general_task_checkbox {
-	width: 100%;
+	/*width: 100%;*/
 }
 
 .on_general {
@@ -384,7 +396,8 @@ button {
 
 
 .general_task_text {
-	min-width: 25vw;
+	/*min-width: 10vw;*/
+	width: 100%;
 	p {
 		margin-left: 2px;
 	}

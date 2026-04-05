@@ -2,11 +2,22 @@ document.addEventListener("DOMContentLoaded", function () {
 	let app_data = {};
 	let next_spot = 0;
 	let general_tasks;
+	let category_colors;
+	let set_colors = [];
+
 
 // Region Helper ==========================================================
 	function unhyphenatedName(name) { return name.replaceAll("-", " ") }
 	function sortNumbers(a, b) { return a - b; }
 	const delay = ms => new Promise(res => setTimeout(res, ms));
+	function generateColors(n) {
+	  const colors = [];
+	  for (let i = 0; i < n; i++) {
+	    const hue = Math.round((360 / n) * i);
+	    colors.push(`hsl(${hue}, 45%, 60%)`);
+	  }
+	  return colors;
+	}
 // End Region Helper ======================================================
 
 
@@ -597,22 +608,43 @@ document.addEventListener("DOMContentLoaded", function () {
 // Region End PageActions ===============================================================	
 
 // Region PageBuild ====================================================================
-	function createGeneralTask(text, category_project, spot, idx, priority, task_idx) {
+	function parseHistoryDate(date) {
+		const seconds = Math.round((new Date() - new Date(date)) / 1000, 0);
+
+		if (seconds < 60)
+			return `${seconds} seconds ago`;
+		if (seconds < 3600)
+			return `${Math.round(seconds / 60, 0)} minutes ago`;
+		if (seconds < 86400)
+			return `${Math.round(seconds / 3600, 0)} hours ago`;
+		else
+			return `${Math.round(seconds / 86400, 0)} days ago`;
+		
+	}
+
+	function createGeneralTask(text, category_project, spot, idx, priority, task_idx, history) {
 		const div = document.createElement("div");
-		div.addEventListener("mouseover", function () {
-			document.querySelector(`#promote_${spot}`).style.display = "block";
-		});
-		div.addEventListener("mouseout", function () {
-			document.querySelector(`#promote_${spot}`).style.display = "none";
-		});
 
 		div.classList.add("general_task");
-		if (priority == 3)
-			div.classList.add("high_priority_general");
-		else if (priority == 2)
-			div.classList.add("medium_priority_general");
+		if (!history) {
+			div.addEventListener("mouseover", function () {
+				document.querySelector(`#promote_${spot}`).style.display = "block";
+			});
+			div.addEventListener("mouseout", function () {
+				document.querySelector(`#promote_${spot}`).style.display = "none";
+			});
+
+			
+			if (priority == 3)
+				div.classList.add("high_priority_general");
+			else if (priority == 2)
+				div.classList.add("medium_priority_general");
+		}
+
+
 		const category = category_project.split("-")[0];
 		const project = category_project.split("-")[1];
+		div.style.backgroundColor = category_colors[category];
 		div.setAttribute("data-category", category);
 		div.setAttribute("data-project", project);
 		div.setAttribute("data-spot", spot);
@@ -650,11 +682,23 @@ document.addEventListener("DOMContentLoaded", function () {
 		task_text_div.appendChild(task_text);
 		task_text_div.appendChild(task_category);
 		task_text_div.appendChild(task_project);
+		if (history) {
+			const task_date = document.createElement("span");
+			
+			task_date.innerText = parseHistoryDate(task_idx);
+			task_date.style.marginLeft = "5px";
+			task_text_div.appendChild(task_date);
+		}
 
-		div.appendChild(checkbox);
+		if (!history)
+			div.appendChild(checkbox);
 		div.appendChild(task_text_div);
-		div.appendChild(promote_btn);
-		document.querySelector("#task_container").appendChild(div);
+		if (!history)
+			div.appendChild(promote_btn);
+		if (!history)
+			document.querySelector("#task_container").appendChild(div);
+		else
+			document.querySelector("#complete_container").appendChild(div);
 	}
 
 	function createCategory(category) {
@@ -669,6 +713,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		const category_content = document.createElement("div");
 		category_content.classList.add("category_content");
+		category_content.style.backgroundColor = category_colors[category];
+		
 		category_content.id = `cat_${category.replaceAll(" ", "-")}_content`;
 
 		const add_project_btn = document.createElement("button");
@@ -779,6 +825,13 @@ document.addEventListener("DOMContentLoaded", function () {
 		
 		document.querySelector(`#${parent_id} > div.project_task_container`).appendChild(task_div);
 	}
+
+	function createCompleteSeperator(label) {
+		const complete_start_div = document.createElement("div");
+		complete_start_div.innerText = label;
+		complete_start_div.classList.add("seperator");
+		document.querySelector("#complete_container").appendChild(complete_start_div);
+	}
 // Region End PageBuild ================================================================
 	function debugData() {
 		let on_main_list = [];
@@ -798,11 +851,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		console.log(on_main_list);
 	}
 
-	function refreshPage(data) {
-		//debugData();
-
-		
-
+	function clearPage() {
 		const existing_tasks = document.getElementsByClassName("general_task");
 		let counter = 0;
 		while (counter < existing_tasks.length) {
@@ -813,9 +862,21 @@ document.addEventListener("DOMContentLoaded", function () {
 		while (counter < existing_categories.length) {
 			existing_categories[counter].remove();
 		}
+	}
 
+	function refreshPage(data) {
+		clearPage();
 		
 		general_tasks = {"highest": 0};
+		set_colors = generateColors(Object.keys(data["categories"]).length);
+		category_colors = {};
+		let i = 0;
+		for (const category in data["categories"]) {
+			category_colors[category] = set_colors[i];
+			i++;
+		}
+		
+		
 		
 		for (const category in data["categories"]) {
 			createCategory(category);
@@ -850,14 +911,48 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 		}
 
-		let i = 1;
+		i = 1;
 		while (i <= general_tasks["highest"]) {
 			createGeneralTask(general_tasks[i]["task"], general_tasks[i]["category-project"], 
 				general_tasks[i]["spot"], general_tasks[i]["idx"], general_tasks[i]["priority"],
-				general_tasks[i]["task_idx"]);
+				general_tasks[i]["task_idx"], false);
 			i++;
 		}
+
+
+		const completed_list = Object.keys(app_data["completed"]["tasks"]).reverse();
+		createCompleteSeperator("Today");
+
+		let week = false, month = false, year = false, all_time = false;
+		const day_seconds = 86400, week_seconds = 86400 * 7, month_seconds = 86400 * 30, year_seconds = 86400 * 365;
+
+		for (const task of completed_list) {
+			const cat_proj = `${app_data["completed"]["tasks"][task]["category"]}-${app_data["completed"]["tasks"][task]["project"]}`;
+			const task_date = app_data["completed"]["tasks"][task]["date"];
+			const hist_dist = (new Date() - new Date(app_data["completed"]["tasks"][task]["date"])) / 1000;
+			if (!week && hist_dist > day_seconds) {
+				week = true;
+				createCompleteSeperator("Past 7 days");
+			}
+			else if (!month && hist_dist > week_seconds) {
+				month = true;
+				createCompleteSeperator("Past 30 days");
+			}
+			else if (!year && hist_dist > month_seconds) {
+				year = true;
+				createCompleteSeperator("Past 365 days");
+			}
+			else if (!year && hist_dist > year_seconds) {
+				year = true;
+				createCompleteSeperator("Past 365 days");
+			}
+
+
+			createGeneralTask(app_data["completed"]["tasks"][task]["task"], cat_proj,
+				task + 1, 0, 0, task_date, true);
+		}
 	}
+
 
 
 // Region EventListeners
@@ -891,6 +986,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	document.querySelector("#delete_task_button").addEventListener("click", deleteTask);
 	document.querySelector("#task_partial_input").addEventListener("focusout", saveTaskPartials);
+
+
 // Region End EventListeners
 
 	getData();
