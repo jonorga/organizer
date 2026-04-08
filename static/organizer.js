@@ -862,6 +862,10 @@ document.addEventListener("DOMContentLoaded", function () {
 		while (counter < existing_categories.length) {
 			existing_categories[counter].remove();
 		}
+		const existing_seperators = document.getElementsByClassName("seperator");
+		while (counter < existing_seperators.length) {
+			existing_seperators[counter].remove();
+		}
 	}
 
 	function refreshPage(data) {
@@ -923,14 +927,18 @@ document.addEventListener("DOMContentLoaded", function () {
 		const completed_list = Object.keys(app_data["completed"]["tasks"]).reverse();
 		createCompleteSeperator("Today");
 
-		let week = false, month = false, year = false, all_time = false;
-		const day_seconds = 86400, week_seconds = 86400 * 7, month_seconds = 86400 * 30, year_seconds = 86400 * 365;
+		let yesterday = false, week = false, month = false, year = false, all_time = false;
+		const day_seconds = 86400, yesterday_seconds = 86400 * 2, week_seconds = 86400 * 7, month_seconds = 86400 * 30, year_seconds = 86400 * 365;
 
 		for (const task of completed_list) {
 			const cat_proj = `${app_data["completed"]["tasks"][task]["category"]}-${app_data["completed"]["tasks"][task]["project"]}`;
 			const task_date = app_data["completed"]["tasks"][task]["date"];
 			const hist_dist = (new Date() - new Date(app_data["completed"]["tasks"][task]["date"])) / 1000;
-			if (!week && hist_dist > day_seconds) {
+			if (!yesterday && hist_dist > day_seconds && hist_dist < yesterday_seconds) {
+				yesterday = true;
+				createCompleteSeperator("Yesterday");
+			}
+			else if (!week && hist_dist > yesterday_seconds) {
 				week = true;
 				createCompleteSeperator("Past 7 days");
 			}
