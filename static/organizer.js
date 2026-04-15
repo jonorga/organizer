@@ -478,7 +478,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const spot = e.srcElement.getAttribute("data-spot") || 0;
 		const date = e.srcElement.getAttribute("data-date") || 0;
 
-		const on_general = [...e.srcElement.classList].includes("on_general");
+		const on_general = e.srcElement.classList.contains("on_general");
 
 		
 		openTaskPopup(task, priority, category, project, idx, on_general, spot, date, task_idx);
@@ -605,6 +605,50 @@ document.addEventListener("DOMContentLoaded", function () {
 		refreshPage(app_data);
 		saveData(app_data);
 	}
+
+	function selectedIsFocused(selected) {
+		return selected["category"] == app_data["focused_task"]["category"]
+			&& selected["project"] == app_data["focused_task"]["project"]
+			&& selected["project_idx"] == app_data["focused_task"]["project_idx"]
+			&& selected["task_idx"] == app_data["focused_task"]["task_idx"]
+	}
+
+	function toggleGeneralTask(e) {
+		const elem = e.srcElement.classList.contains("general_task_text") ? e.srcElement : e.srcElement.parentElement;
+		
+		const parent_elem = elem.parentElement;
+		
+		const new_focus_task = {
+			"category": parent_elem.getAttribute("data-category"),
+			"project": parent_elem.getAttribute("data-project"),
+			"project_idx": parent_elem.getAttribute("data-idx"),
+			"task_idx": parent_elem.getAttribute("data-taskidx"),
+			"stamp": new Date().toJSON()
+		}
+
+		
+		if (!("focused_task" in app_data)) {
+			app_data["focused_task"] = new_focus_task;
+		}
+		else {
+			if (selectedIsFocused(new_focus_task)) {
+				delete app_data.focused_task;
+			}
+			else {
+				
+			}
+		}
+		console.log(app_data);
+
+
+		if (elem.hasAttribute("focused_task")) {
+
+			elem.removeAttribute("focused_task");
+		}
+		else {
+			elem.setAttribute("focused_task", "");
+		}
+	}
 // Region End PageActions ===============================================================	
 
 // Region PageBuild ====================================================================
@@ -624,6 +668,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	function createGeneralTask(text, category_project, spot, idx, priority, task_idx, history) {
 		const div = document.createElement("div");
+
+		
 
 		div.classList.add("general_task");
 		if (!history) {
@@ -667,6 +713,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		promote_btn.id = `promote_${spot}`;
 
 		const task_text_div = document.createElement("div");
+		task_text_div.addEventListener("click", toggleGeneralTask);
 
 		task_text_div.classList.add("general_task_text");
 		const task_text = document.createElement("p");

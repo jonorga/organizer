@@ -11,6 +11,10 @@
 	min-height: 100%;
 }
 
+div[focused_task] {
+	background-color: gold;
+}
+
 #task_partial_input {
 	height: 20vh;
 }
